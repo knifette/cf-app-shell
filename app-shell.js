@@ -13,10 +13,15 @@
   // --- app-mode detection (persisted) ---
   try {
     var p = new URLSearchParams(location.search);
-    var isApp = p.get('source') === 'app'
-      || (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())
-      || localStorage.getItem('cf_app') === '1';
-    if (p.get('source') === 'app') localStorage.setItem('cf_app', '1');
+    // App mode: the REAL native app (Capacitor) persists per browsing-session; a desktop browser
+    // NEVER sticks. ?source=app previews the current page only and is NOT remembered on desktop.
+    var cap = window.Capacitor;
+    var isNative = !!(cap && ((cap.isNativePlatform && cap.isNativePlatform()) || (cap.platform && cap.platform !== 'web')));
+    var qpApp = p.get('source') === 'app';
+    try { localStorage.removeItem('cf_app'); } catch (e2) {}            // clear the old desktop-sticky flag
+    if (isNative) { try { sessionStorage.setItem('cf_app_native', '1'); } catch (e3) {} }
+    var nativeSession = false; try { nativeSession = sessionStorage.getItem('cf_app_native') === '1'; } catch (e4) {}
+    var isApp = isNative || nativeSession || qpApp;
     if (!isApp) return;                                  // normal web/desktop: do nothing
   } catch (e) { return; }
   root.classList.add('cf-app');
