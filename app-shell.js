@@ -1706,8 +1706,8 @@
   /* CONFIG: mirror the WooCommerce free-shipping minimum here. NOT a fabricated
      price — must mirror the store's own "Free shipping requires a minimum order
      amount" setting. While CF_FREESHIP_CONFIRMED is false the bar stays hidden. */
-  var CF_FREESHIP_THRESHOLD = 0;     /* TODO: Joaquin to set the live WC free-shipping minimum (build task flags $600 likely too high for a $125-ish catalog; consider $199-$299). */
-  var CF_FREESHIP_CONFIRMED = false; /* TODO: flip true once CF_FREESHIP_THRESHOLD matches the live WooCommerce setting. */
+  var CF_FREESHIP_THRESHOLD = 600;   /* Mirrors live WooCommerce rule "Free Shipping (orders over $600)" in the United States zone (min $600), confirmed in wp-admin 2026-06-15. */
+  var CF_FREESHIP_CONFIRMED = true;  /* Verified against the live WC shipping-zone setting. */
 
   function parseMoney(str) {
     if (str == null) return null;
