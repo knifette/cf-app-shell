@@ -2131,3 +2131,11 @@
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', init);
   else init();
 })();
+/* ---- public web skin (>=769px). Separate file so a web-side change is a
+   small reviewable diff and can be reverted without touching the app blob.
+   Disable by removing these lines, or per-visit with ?cf_web=off. ---- */
+(function(){ if(document.getElementById('cf-web-js')) return;
+  var s=document.createElement('script'); s.id='cf-web-js'; s.async=false;
+  s.src='https://cdn.jsdelivr.net/gh/knifette/cf-app-shell@v1.1.0/cf-web.js';
+  (document.head||document.documentElement).appendChild(s);
+})();
