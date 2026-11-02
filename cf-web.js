@@ -324,6 +324,12 @@
    paying yet there, and the product page keeps its own trust row. */
 '  html.cf-web.cf-shop .cf-paytrust{display:none;}',
 
+/* The theme's category line duplicates the fitment chip word for word
+   ("S1000RR (2020-2022)" vs the chip's "S1000RR 2020-2022") and costs 38px on
+   every card. Hidden only where a chip actually rendered, so a card without
+   one keeps its label - and browsers without :has() simply keep both. */
+'  html.cf-web.cf-shop li.product:has(.cf-fitchip) .ast-woo-product-category{display:none;}',
+
 /* product page: the injected blocks need their phone sizing too */
 '  html.cf-web .cf-ship-row{font-size:11.5px;}',
 '  html.cf-web .cf-fitbox{padding:13px 14px;gap:10px;}',
