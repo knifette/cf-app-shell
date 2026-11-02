@@ -356,6 +356,16 @@
 '  html.cf-web .cf-fitbox-s{font-size:11.5px;}',
 '  html.cf-web .cf-sw button{flex:1 1 90px;min-width:84px;font-size:11.5px;}',
 '  html.cf-web .cf-sw i{height:30px;}',
+
+/* Astra leaves 68px of margin above and below the main column on
+   phones, so the breadcrumb floated in dead space under the red bar.
+   Desktop already zeroes this inside the min-width block. */
+'  html.cf-web.cf-shop #primary,html.cf-web.cf-pdp #primary{margin-top:16px!important;margin-bottom:28px!important;}',
+/* app-shell's Sort/Filter bar gives the count nowrap+overflow:hidden
+   and 11px less room than it needs, so it clipped mid-word. */
+'  html.cf-web .cf-filters-resultcount{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;padding-left:10px;}',
+/* "Select options" broke onto two lines inside a 128px card button. */
+'  html.cf-web.cf-shop ul.products li.product a.button{font-size:12.5px!important;line-height:1.2;white-space:nowrap;padding:12px 10px!important;}',
 '}',
 
 
@@ -805,10 +815,32 @@
   /* ------------------------------------------------------------------ */
   /* boot                                                                */
   /* ------------------------------------------------------------------ */
+  /* The mobile bar's count reads "Showing 1-12 of 73 results" in a slot
+     that fits about 130px. The CSS above stops it clipping mid-word;
+     this shortens the wording so it does not need to truncate at all.
+     app-shell builds that bar, so it may not exist yet when we boot. */
+  function countFix() {
+    if (!MOBILE()) return;
+    function trim() {
+      var n = $('.cf-filters-resultcount');
+      if (!n) return false;
+      var m = /Showing\s+([\d\u2013\u2014-]+)\s+of\s+(\d+)/.exec(n.textContent || '');
+      if (m) n.textContent = m[1] + ' of ' + m[2];
+      return true;
+    }
+    if (trim() || !window.MutationObserver) return;
+    var mo = new MutationObserver(function () {
+      if (trim()) mo.disconnect();
+    });
+    mo.observe(D.body, { childList: true, subtree: true });
+    setTimeout(function () { mo.disconnect(); }, 6000);
+  }
+
   function boot() {
     R.classList.add('cf-web');
     injectCSS();
     announce();
+    countFix();
 
     var b = D.body.className || '';
     if (/single-product/.test(b)) pdp();
