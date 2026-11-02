@@ -25,6 +25,10 @@
 
   var FREESHIP = 600; // live WooCommerce rule, confirmed on the store
 
+  /* <=768px is the app skin's scope (see the WordPress app-skin protocol):
+     app-shell.js owns the chrome there, so this file defers to it. */
+  function MOBILE() { return window.innerWidth <= 768 || R.classList.contains('cf-native'); }
+
   /* ------------------------------------------------------------------ */
   /* fonts                                                               */
   /* ------------------------------------------------------------------ */
@@ -283,6 +287,46 @@
 
 '}', /* end min-width:769px */
 
+/* ------------------------------------------------------------------ */
+/* MOBILE (<=768px). app-shell.js already owns the mobile/native app    */
+/* chrome - header, Sort/Filter bar, garage, sticky add-to-cart, trust. */
+/* This layer does NOT rebuild any of that. It only (a) styles the      */
+/* elements this file injects, which were previously left raw on a      */
+/* phone, and (b) brings the card treatment in line with desktop.       */
+/* Width-scoped, so the native app gets the same look (platform parity).*/
+/* ------------------------------------------------------------------ */
+'@media (max-width:768px){',
+
+/* the announcement bar rendered as 53px of unstyled text before this */
+'  html.cf-web .cf-ann{display:flex;align-items:center;justify-content:center;gap:0;background:var(--cfw-red);color:#FFFFFF;font-family:var(--cfw-disp);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;text-align:center;padding:7px 12px;line-height:1.2;}',
+/* the second clause does not fit a 375px line; the bar has one job here */
+'  html.cf-web .cf-ann em{display:none;}',
+
+/* cards: same chromeless treatment as desktop, tuned for a 158px column */
+'  html.cf-web.cf-shop ul.products li.product{background:transparent;border:0;position:relative;}',
+'  html.cf-web.cf-shop .astra-shop-thumbnail-wrap{position:relative;border:1px solid var(--cfw-line);border-radius:2px;overflow:hidden;background:#08080A;}',
+'  html.cf-web.cf-shop ul.products li.product img{display:block;width:100%;height:auto;margin:0;border-radius:0;}',
+'  html.cf-web.cf-shop ul.products li.product .woocommerce-loop-product__title,html.cf-web.cf-shop ul.products li.product h2{font-family:var(--cfw-body)!important;font-size:12.5px!important;line-height:1.38;font-weight:500;color:var(--cfw-ink);margin:10px 0 4px!important;padding:0!important;}',
+'  html.cf-web.cf-shop ul.products li.product .price{font-family:var(--cfw-disp)!important;font-size:14px!important;font-weight:600;color:var(--cfw-ink)!important;display:block;margin:0;}',
+
+/* was position:static on a phone, so it sat in the flow and deformed the card */
+'  html.cf-web .cf-fitchip{position:absolute;top:7px;left:7px;z-index:2;font-family:var(--cfw-body);font-size:9px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--cfw-mute);background:rgba(8,8,10,.86);border:1px solid var(--cfw-line);border-radius:2px;padding:3px 6px;line-height:1.1;}',
+'  html.cf-web .cf-fitchip.cf-fitchip-on{color:#FFFFFF;background:var(--cfw-red);border-color:var(--cfw-red);}',
+'  html.cf-web .cf-from{font-family:var(--cfw-body);font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--cfw-faint);margin-right:5px;}',
+
+/* the keyword string is for search, not for a 158px card */
+'  html.cf-web.cf-shop ul.products li.product .cf-kw{display:none;}',
+
+/* product page: the injected blocks need their phone sizing too */
+'  html.cf-web .cf-ship-row{font-size:11.5px;}',
+'  html.cf-web .cf-fitbox{padding:13px 14px;gap:10px;}',
+'  html.cf-web .cf-fitbox-t{font-size:13px;}',
+'  html.cf-web .cf-fitbox-s{font-size:11.5px;}',
+'  html.cf-web .cf-sw button{flex:1 1 90px;min-width:84px;font-size:11.5px;}',
+'  html.cf-web .cf-sw i{height:30px;}',
+'}',
+
+
 /* respect the setting, everywhere */
 '@media (prefers-reduced-motion:reduce){',
 '  html.cf-web *{transition-duration:.01ms!important;animation-duration:.01ms!important;}',
@@ -388,6 +432,10 @@
     /* ---- results header: title, count and sort on one line ---- */
     (function head() {
       if ($('.cf-head')) return;
+      /* app-shell.js already renders a Sort/Filter bar with the result
+         count on <=768px. Building this too would duplicate it, and it
+         would steal the count node out of that bar. */
+      if (MOBILE()) return;
       var wrap = $('.ast-woocommerce-container') || primary;
       var count = $('.woocommerce-result-count');
       var order = $('.woocommerce-ordering');
@@ -440,6 +488,30 @@
     $$('ul.products li.product').forEach(function (li) {
       decorateCard(li, g);
     });
+
+    if (MOBILE()) foldFix();
+  }
+
+  /* On a phone the app skin's payment-reassurance panel sits ABOVE the grid,
+     which pushed the first product to y=660 on a 812px screen - a shopper met
+     card logos before a single part. Trust belongs next to the decision to
+     pay, so on the archive it moves below the products. Measured, not guessed.
+     app-shell injects it late, so this retries rather than assuming it is
+     there at boot. */
+  function foldFix() {
+    var tries = 0;
+    (function move() {
+      var panel = $('.cf-paytrust-secure');
+      var grid = $('ul.products');
+      if (panel && grid && grid.parentNode) {
+        /* only if it is still sitting above the grid */
+        if (panel.compareDocumentPosition(grid) & Node.DOCUMENT_POSITION_FOLLOWING) {
+          grid.parentNode.insertBefore(panel, grid.nextSibling);
+        }
+        return;
+      }
+      if (++tries < 12) setTimeout(move, 350);
+    })();
   }
 
   function decorateCard(li, g) {
