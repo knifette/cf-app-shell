@@ -275,6 +275,9 @@
 /* generic woo chrome */
 '  html.cf-web .woocommerce-message,html.cf-web .woocommerce-info,html.cf-web .woocommerce-error{background:var(--cfw-raise)!important;color:var(--cfw-ink)!important;border-top-color:var(--cfw-red)!important;}',
 '  html.cf-web .woocommerce-message a,html.cf-web .woocommerce-info a{color:var(--cfw-red-lift)!important;}',
+'  /* Woo blocks the form with a white overlay while it recalculates; on a dark',
+'     checkout that is a full-page white flash at the exact moment someone pays. */',
+'  html.cf-web .blockUI.blockOverlay{background:var(--cfw-ground)!important;}',
 '  html.cf-web select,html.cf-web input[type=text],html.cf-web input[type=email],html.cf-web input[type=search],html.cf-web textarea{background:var(--cfw-raise);color:var(--cfw-ink);border:1px solid var(--cfw-line);border-radius:2px;}',
 '  html.cf-web .star-rating span::before{color:var(--cfw-red);}',
 
@@ -363,6 +366,10 @@
   /* ------------------------------------------------------------------ */
   function announce() {
     if ($('.cf-ann')) return;
+    /* The elementor_canvas homepage ships its own fixed header, which paints
+       over this bar completely - it would add 38px above a full-bleed hero
+       and show nothing. Leave that page's own design alone. */
+    if (/page-template-elementor_canvas/.test(D.body.className)) return;
     var page = $('#page') || D.body;
     var bar = el('div', 'cf-ann');
     bar.appendChild(el('span', null, 'FREE SHIPPING OVER ' + money(FREESHIP)));
