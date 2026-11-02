@@ -501,16 +501,18 @@
   function foldFix() {
     var tries = 0;
     (function move() {
-      var panel = $('.cf-paytrust-secure');
+      /* .cf-paytrust is the 245px CONTAINER. .cf-paytrust-secure is only the
+         heading line inside it - moving that moves nothing visible. */
+      var panel = $('.cf-paytrust');
       var grid = $('ul.products');
-      if (panel && grid && grid.parentNode) {
-        /* only if it is still sitting above the grid */
+      if (panel && grid && grid.parentNode && panel !== grid.nextSibling) {
+        /* act only while it is still above the grid */
         if (panel.compareDocumentPosition(grid) & Node.DOCUMENT_POSITION_FOLLOWING) {
           grid.parentNode.insertBefore(panel, grid.nextSibling);
         }
-        return;
       }
-      if (++tries < 12) setTimeout(move, 350);
+      /* keep watching: app-shell renders this late and can re-render it */
+      if (++tries < 14) setTimeout(move, 350);
     })();
   }
 
