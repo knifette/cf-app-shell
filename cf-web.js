@@ -50,8 +50,8 @@
 '  --cfw-ink:#E9EAED;',
 '  --cfw-mute:#9B9EA7;',
 '  --cfw-faint:#6B6E76;',
-'  --cfw-red:#E01926;',
-'  --cfw-red-lift:#FF4350;',
+'  --cfw-red:#E10600;',
+'  --cfw-red-lift:#FF4133;',
 '  --cfw-disp:"Chakra Petch", "Inter", system-ui, sans-serif;',
 '  --cfw-body:"Inter", system-ui, -apple-system, sans-serif;',
 '}',
@@ -151,7 +151,7 @@
 '  html.cf-web .cf-from{font-family:var(--cfw-body);font-size:11px;font-weight:500;letter-spacing:.08em;color:var(--cfw-faint);margin-right:6px;text-transform:uppercase;}',
 
 /* generation badge, sitting on the image as a badge rather than in the link text */
-'  html.cf-web .cf-fitchip{position:absolute;top:10px;left:10px;z-index:2;font-family:var(--cfw-body);font-size:10px;font-weight:600;letter-spacing:.09em;color:var(--cfw-mute);background:rgba(8,8,10,.82);backdrop-filter:blur(3px);border:1px solid var(--cfw-line);border-radius:2px;padding:4px 8px;text-transform:uppercase;}',
+'  html.cf-web .cf-fitchip{position:absolute;top:10px;left:10px;z-index:2;font-family:var(--cfw-body);font-size:10px;font-weight:600;letter-spacing:.09em;color:var(--cfw-mute);background:rgba(8,8,10,.84);backdrop-filter:blur(3px);border:1px solid var(--cfw-line);border-radius:2px;padding:4px 8px;text-transform:uppercase;}',
 '  html.cf-web .cf-fitchip.cf-fitchip-on{color:#fff;background:var(--cfw-red);border-color:var(--cfw-red);}',
 
 /* Astra renders TWO add-to-cart links per card. Drop the hover-overlay
@@ -230,7 +230,7 @@
 /* buy button */
 '  html.cf-web.cf-pdp form.cart{margin:0!important;}',
 '  html.cf-web.cf-pdp form.cart button.single_add_to_cart_button.single_add_to_cart_button{width:100%;background:var(--cfw-red)!important;color:#fff!important;border:0!important;border-radius:2px!important;padding:18px 20px!important;font-family:var(--cfw-disp)!important;font-size:15px!important;font-weight:700!important;letter-spacing:.1em!important;text-transform:uppercase;transition:background .15s ease;}',
-'  html.cf-web.cf-pdp form.cart button.single_add_to_cart_button.single_add_to_cart_button:hover{background:#F32133!important;}',
+'  html.cf-web.cf-pdp form.cart button.single_add_to_cart_button.single_add_to_cart_button:hover{background:#FF2A1C!important;}',
 '  html.cf-web.cf-pdp form.cart button.single_add_to_cart_button.single_add_to_cart_button.disabled{background:var(--cfw-raise2)!important;color:var(--cfw-faint)!important;cursor:not-allowed;}',
 '  html.cf-web.cf-pdp .quantity input[type=number]{background:var(--cfw-raise);border:1px solid var(--cfw-line);color:var(--cfw-ink);padding:14px 8px;border-radius:2px;}',
 
@@ -243,6 +243,9 @@
 
 /* the app-shell already builds these rows in the DOM; desktop just never
    showed them. Reveal and restyle rather than build a second set. */
+'  html.cf-web.cf-pdp .cf-pdp-fit{display:none!important;}',
+'  html.cf-web.cf-pdp .StripeElement{margin:4px 0 18px!important;}',
+'  html.cf-web.cf-pdp .cf-sw button{flex:0 0 auto;min-width:104px;}',
 '  html.cf-web.cf-pdp .cf-trustrow{display:flex!important;flex-wrap:wrap;gap:8px;margin:18px 0 0;}',
 '  html.cf-web.cf-pdp .cf-trustrow a,html.cf-web.cf-pdp .cf-trustrow span{font-size:11px;color:var(--cfw-mute);border:1px solid var(--cfw-line);border-radius:2px;padding:6px 10px;text-decoration:none;}',
 '  html.cf-web.cf-pdp .cf-trustrow a:hover{border-color:var(--cfw-line2);color:var(--cfw-ink);}',
@@ -499,9 +502,18 @@
     R.classList.add('cf-pdp');
 
     demoteKeywords();
-    fitBox();
 
     var price = $('.summary p.price');
+
+    /* Stripe renders its "as low as $43/month" block at the top of the
+       summary, above the title. A payment plan only means something once
+       you know the price, so move it under one. */
+    var bnpl = $('.summary .StripeElement');
+    if (bnpl && price && price.parentNode) {
+      price.parentNode.insertBefore(bnpl, price.nextSibling);
+    }
+
+    fitBox();
     fromPrice(price);
 
     if (!form) {
