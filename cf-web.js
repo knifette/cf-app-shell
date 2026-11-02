@@ -102,29 +102,48 @@
 '  html.cf-web.cf-shop #secondary{width:auto!important;max-width:none!important;padding:0!important;margin:0!important;position:sticky;top:18px;}',
 '  html.cf-web.cf-shop #primary{width:auto!important;max-width:none!important;padding:0!important;margin:0!important;min-width:0;}',
 
-/* the fitment rail */
-'  html.cf-web.cf-shop #secondary .widget{background:transparent;border:0;border-top:1px solid var(--cfw-line);padding:20px 0 4px;margin:0;}',
+/* the fitment rail - ONE row system for every list in it, so the
+   left edge, the row height and the hairline never change between
+   widgets. Before this the bike list and the part-type list each
+   had their own padding and the rail read as two pasted-in lists. */
+'  html.cf-web.cf-shop #secondary .widget{background:transparent;border:0;border-top:1px solid var(--cfw-line);padding:22px 0 6px;margin:0;}',
 '  html.cf-web.cf-shop #secondary .widget:first-child{border-top:0;padding-top:0;}',
-'  html.cf-web.cf-shop #secondary .widget-title,html.cf-web.cf-shop #secondary h2{font-family:var(--cfw-disp);font-size:11px;font-weight:600;letter-spacing:.18em;color:var(--cfw-mute);margin:0 0 12px;text-transform:uppercase;}',
-'  html.cf-web.cf-shop #secondary a{color:var(--cfw-ink);font-size:14px;text-decoration:none;}',
-'  html.cf-web.cf-shop #secondary a:hover{color:var(--cfw-red-lift);}',
-'  html.cf-web.cf-shop #secondary input[type=search],html.cf-web.cf-shop #secondary input[type=text]{width:100%;box-sizing:border-box;background:var(--cfw-raise);border:1px solid var(--cfw-line);color:var(--cfw-ink);padding:11px 12px;border-radius:2px;font-family:var(--cfw-body);font-size:14px;}',
-'  html.cf-web.cf-shop #secondary input::placeholder{color:var(--cfw-faint);}',
-'  html.cf-web.cf-shop #secondary .cf-parttype li{border-bottom:1px solid var(--cfw-line)!important;}',
-'  html.cf-web.cf-shop #secondary .price_slider_wrapper .ui-slider{background:var(--cfw-line);}',
-'  html.cf-web.cf-shop #secondary .ui-slider .ui-slider-range{background:var(--cfw-red);}',
-'  html.cf-web.cf-shop #secondary .ui-slider .ui-slider-handle{background:var(--cfw-ink);border:0;}',
-'  html.cf-web.cf-shop #secondary .price_label{color:var(--cfw-mute);font-size:13px;}',
-'  html.cf-web.cf-shop #secondary .button{background:var(--cfw-raise2);color:var(--cfw-ink);border:1px solid var(--cfw-line2);border-radius:2px;font-family:var(--cfw-disp);font-size:12px;letter-spacing:.1em;font-weight:600;padding:9px 16px;}',
-'  html.cf-web.cf-shop #secondary .button:hover{border-color:var(--cfw-red);color:#fff;}',
+'  html.cf-web.cf-shop #secondary .widget-title,html.cf-web.cf-shop #secondary h2{font-family:var(--cfw-disp);font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--cfw-faint);margin:0 0 6px;text-transform:uppercase;}',
+'  html.cf-web.cf-shop #secondary a{color:var(--cfw-ink);text-decoration:none;}',
 
-/* generation filter, promoted to the top of the rail */
-'  html.cf-web .cf-gen{display:flex;flex-direction:column;gap:2px;}',
-'  html.cf-web .cf-gen a{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid transparent;border-radius:2px;font-size:14px;}',
-'  html.cf-web .cf-gen a:hover{background:var(--cfw-raise);border-color:var(--cfw-line);}',
-'  html.cf-web .cf-gen a.cf-on{background:var(--cfw-raise);border-color:var(--cfw-red);}',
-'  html.cf-web .cf-gen b{font-weight:600;}',
-'  html.cf-web .cf-gen span{font-size:11px;color:var(--cfw-faint);font-variant-numeric:tabular-nums;}',
+'  html.cf-web.cf-shop #secondary .cf-gen a,html.cf-web.cf-shop #secondary .cf-parttype a{display:flex;align-items:center;justify-content:space-between;gap:10px;box-sizing:border-box;padding:9px 0 9px 10px;border-left:2px solid transparent;border-bottom:1px solid var(--cfw-line);border-radius:0;background:transparent;font-size:13px;font-weight:500;line-height:1.25;transition:color .14s,border-color .14s;}',
+'  html.cf-web.cf-shop #secondary .cf-gen a:hover,html.cf-web.cf-shop #secondary .cf-parttype a:hover{color:var(--cfw-red-lift);border-left-color:var(--cfw-line2);background:transparent;padding-left:10px;}',
+'  html.cf-web.cf-shop #secondary .cf-gen a:last-child,html.cf-web.cf-shop #secondary .cf-parttype li:last-child a{border-bottom:0;}',
+'  html.cf-web.cf-shop #secondary .cf-gen a.cf-on{color:#FFFFFF;font-weight:600;border-left-color:var(--cfw-red);background:transparent;}',
+'  html.cf-web.cf-shop #secondary .cf-gen b{font-weight:inherit;}',
+'  html.cf-web.cf-shop #secondary .cf-parttype li{border-bottom:0;}',
+
+/* search: an outline button, not a red slab. Red in this rail is
+   reserved for the active filter bar and the cards' own buttons. */
+'  html.cf-web.cf-shop #secondary .woocommerce-product-search{display:flex;gap:8px;margin-top:2px;}',
+'  html.cf-web.cf-shop #secondary input[type=search],html.cf-web.cf-shop #secondary input[type=text]{flex:1 1 auto;min-width:0;width:100%;box-sizing:border-box;background:var(--cfw-raise);border:1px solid var(--cfw-line);color:var(--cfw-ink);padding:9px 11px;border-radius:2px;font-family:var(--cfw-body);font-size:13px;height:auto;box-shadow:none;}',
+'  html.cf-web.cf-shop #secondary input[type=search]:focus{border-color:var(--cfw-red);outline:0;}',
+'  html.cf-web.cf-shop #secondary input::placeholder{color:var(--cfw-faint);}',
+/* an earlier site rule pins .widget_product_search button to solid red
+   with !important; red in this rail belongs to the active filter, so
+   this one has to answer in kind. */
+'  html.cf-web.cf-shop #secondary .woocommerce-product-search button,html.cf-web.cf-shop #secondary .button{flex:0 0 auto;background:transparent!important;color:var(--cfw-mute)!important;border:1px solid var(--cfw-line2)!important;border-radius:2px;font-family:var(--cfw-disp);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:9px 13px;cursor:pointer;transition:color .14s,border-color .14s,background .14s;}',
+'  html.cf-web.cf-shop #secondary .woocommerce-product-search button:hover,html.cf-web.cf-shop #secondary .button:hover{color:#FFFFFF!important;border-color:var(--cfw-red)!important;background:var(--cfw-red)!important;}',
+
+/* price: the Filter button and the range sat in one block element,
+   so the range clipped at the rail edge. One flex row holds both. */
+'  html.cf-web.cf-shop #secondary .price_slider_wrapper .ui-slider{background:var(--cfw-line);height:3px;border:0;border-radius:2px;margin:12px 2px 16px;}',
+'  html.cf-web.cf-shop #secondary .ui-slider .ui-slider-range{background:var(--cfw-red);border-radius:2px;}',
+'  html.cf-web.cf-shop #secondary .ui-slider .ui-slider-handle{background:var(--cfw-ink);border:0;width:12px;height:12px;border-radius:50%;top:-5px;margin-left:-6px;}',
+'  html.cf-web.cf-shop #secondary .price_slider_amount{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}',
+'  html.cf-web.cf-shop #secondary .price_label{color:var(--cfw-mute);font-size:11.5px;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right;}',
+
+/* the theme prints the category again under the photo, in #334155 on
+   near-black, and it is the same words as the fitment chip already on
+   the image. Illegible AND duplicated, so it goes. */
+'  html.cf-web.cf-shop li.product:has(.cf-fitchip) .ast-woo-product-category{display:none;}',
+
+'  html.cf-web .cf-gen{display:block;}',
 
 /* results header */
 '  html.cf-web.cf-shop .cf-head{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end;padding-bottom:18px;border-bottom:1px solid var(--cfw-line);margin-bottom:28px;}',
@@ -473,13 +492,6 @@
       var side = $('#secondary');
       if (!side || $('.cf-gen')) return;
 
-      /* count what is on this page, per generation, from the cards themselves */
-      var counts = {};
-      $$('ul.products li.product').forEach(function (li) {
-        var g = genOf(li);
-        if (g) counts[g.slug] = (counts[g.slug] || 0) + 1;
-      });
-
       var here = location.pathname;
       var w = el('div', 'ast-woo-sidebar-widget widget');
       w.appendChild(el('h2', 'widget-title', 'Shop by bike'));
@@ -489,7 +501,6 @@
         a.href = '/product-category/' + slug + '/';
         if (here.indexOf('/' + slug + '/') > -1) a.className = 'cf-on';
         a.appendChild(el('b', null, GEN[slug]));
-        if (counts[slug]) a.appendChild(el('span', null, String(counts[slug]) + ' here'));
         list.appendChild(a);
       });
       w.appendChild(list);
