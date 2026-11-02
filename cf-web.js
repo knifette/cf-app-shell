@@ -611,8 +611,9 @@
            : (gen ? ('Listed for ' + gen.label) : 'Check this fits before you buy')));
     var sub = el('p', 'cf-fitbox-s');
     sub.appendChild(D.createTextNode(fits ? 'Different bike? ' : 'Not sure? '));
-    var a = el('a', null, 'Have us confirm it');
-    a.href = '/fitment/';
+    var a = el('a', null, 'Ask us to confirm it');
+    /* /fitment/ does not exist yet; point at a page that does. */
+    a.href = '/contact/';
     sub.appendChild(a);
     sub.appendChild(D.createTextNode(' \u2014 sales are final, so you should have it in writing first.'));
     body.appendChild(sub);
