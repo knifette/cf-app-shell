@@ -317,6 +317,13 @@
 /* the keyword string is for search, not for a 158px card */
 '  html.cf-web.cf-shop ul.products li.product .cf-kw{display:none;}',
 
+/* The app skin's payment panel is a flex sibling of #primary, so it painted
+   ABOVE the grid on a phone: first product at y=660 on an 812px screen, i.e.
+   card logos before a single part. Its own class is "cf-paytrust-foot", so
+   that placement was never the intent. Hidden on the ARCHIVE only - nobody is
+   paying yet there, and the product page keeps its own trust row. */
+'  html.cf-web.cf-shop .cf-paytrust{display:none;}',
+
 /* product page: the injected blocks need their phone sizing too */
 '  html.cf-web .cf-ship-row{font-size:11.5px;}',
 '  html.cf-web .cf-fitbox{padding:13px 14px;gap:10px;}',
@@ -489,31 +496,6 @@
       decorateCard(li, g);
     });
 
-    if (MOBILE()) foldFix();
-  }
-
-  /* On a phone the app skin's payment-reassurance panel sits ABOVE the grid,
-     which pushed the first product to y=660 on a 812px screen - a shopper met
-     card logos before a single part. Trust belongs next to the decision to
-     pay, so on the archive it moves below the products. Measured, not guessed.
-     app-shell injects it late, so this retries rather than assuming it is
-     there at boot. */
-  function foldFix() {
-    var tries = 0;
-    (function move() {
-      /* .cf-paytrust is the 245px CONTAINER. .cf-paytrust-secure is only the
-         heading line inside it - moving that moves nothing visible. */
-      var panel = $('.cf-paytrust');
-      var grid = $('ul.products');
-      if (panel && grid && grid.parentNode && panel !== grid.nextSibling) {
-        /* act only while it is still above the grid */
-        if (panel.compareDocumentPosition(grid) & Node.DOCUMENT_POSITION_FOLLOWING) {
-          grid.parentNode.insertBefore(panel, grid.nextSibling);
-        }
-      }
-      /* keep watching: app-shell renders this late and can re-render it */
-      if (++tries < 14) setTimeout(move, 350);
-    })();
   }
 
   function decorateCard(li, g) {
