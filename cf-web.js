@@ -126,12 +126,18 @@
 '  html.cf-web.cf-shop .cf-head{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end;padding-bottom:18px;border-bottom:1px solid var(--cf-line);margin-bottom:28px;}',
 '  html.cf-web.cf-shop .cf-head h1{margin:0 0 6px;font-size:40px;line-height:1.02;font-weight:700;letter-spacing:-.02em;}',
 '  html.cf-web.cf-shop .woocommerce-result-count{margin:0;color:var(--cf-mute);font-size:13px;}',
-'  html.cf-web.cf-shop .woocommerce-ordering select,html.cf-web .orderby{background:var(--cf-raise);color:var(--cf-ink);border:1px solid var(--cf-line);border-radius:2px;padding:10px 12px;font-family:var(--cf-body);font-size:13px;}',
+'  html.cf-web.cf-shop .woocommerce-ordering select,html.cf-web select.orderby{background:var(--cf-raise)!important;color:var(--cf-ink)!important;border:1px solid var(--cf-line)!important;border-radius:2px!important;padding:11px 34px 11px 13px!important;font-family:var(--cf-body)!important;font-size:13px!important;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,#9B9EA7 50%),linear-gradient(135deg,#9B9EA7 50%,transparent 50%)!important;background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%!important;background-size:5px 5px,5px 5px!important;background-repeat:no-repeat!important;}',
 '  html.cf-web.cf-shop .woocommerce-ordering{margin:0;}',
+'  html.cf-web.cf-shop .woocommerce-breadcrumb{font-size:12px;color:var(--cf-faint);margin:0 0 16px;}',
+'  html.cf-web.cf-shop .woocommerce-breadcrumb a{color:var(--cf-faint);}',
+'  html.cf-web.cf-shop .woocommerce-breadcrumb a:hover{color:var(--cf-mute);}',
 
 /* the grid: no cards. The photography already carries its own black ground,
    so a card box would only draw a seam the image does not have. */
-'  html.cf-web.cf-shop ul.products{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:34px 26px;margin:0!important;padding:0!important;list-style:none;}',
+'  html.cf-web.cf-shop ul.products{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 28px;margin:0!important;padding:0!important;list-style:none;}',
+'}',
+'@media (min-width:1100px){ html.cf-web.cf-shop ul.products{grid-template-columns:repeat(3,minmax(0,1fr));} }',
+'@media (min-width:769px){',
 '  html.cf-web.cf-shop ul.products::before,html.cf-web.cf-shop ul.products::after{display:none!important;}',
 '  html.cf-web.cf-shop ul.products li.product{width:auto!important;margin:0!important;padding:0!important;float:none!important;clear:none!important;background:transparent;border:0;position:relative;}',
 '  html.cf-web.cf-shop .astra-shop-thumbnail-wrap{position:relative;border:1px solid var(--cf-line);border-radius:2px;overflow:hidden;background:#08080A;transition:border-color .18s ease;}',
@@ -144,14 +150,19 @@
 '  html.cf-web.cf-shop ul.products li.product .price del{display:none;}',
 '  html.cf-web .cf-from{font-family:var(--cf-body);font-size:11px;font-weight:500;letter-spacing:.08em;color:var(--cf-faint);margin-right:6px;text-transform:uppercase;}',
 
-/* generation badge, read off the product_cat- class already on the card */
-'  html.cf-web .cf-fitchip{display:inline-block;font-family:var(--cf-body);font-size:10px;font-weight:600;letter-spacing:.09em;color:var(--cf-mute);border:1px solid var(--cf-line);border-radius:2px;padding:3px 7px;margin:0 0 8px;text-transform:uppercase;}',
+/* generation badge, sitting on the image as a badge rather than in the link text */
+'  html.cf-web .cf-fitchip{position:absolute;top:10px;left:10px;z-index:2;font-family:var(--cf-body);font-size:10px;font-weight:600;letter-spacing:.09em;color:var(--cf-mute);background:rgba(8,8,10,.82);backdrop-filter:blur(3px);border:1px solid var(--cf-line);border-radius:2px;padding:4px 8px;text-transform:uppercase;}',
 '  html.cf-web .cf-fitchip.cf-fitchip-on{color:#fff;background:var(--cf-red);border-color:var(--cf-red);}',
 
-/* on-card add-to-cart: present but quiet until hover */
-'  html.cf-web.cf-shop .ast-on-card-button{background:var(--cf-raise2)!important;color:var(--cf-ink)!important;border:1px solid var(--cf-line2)!important;border-radius:2px!important;font-family:var(--cf-disp)!important;font-size:11px!important;letter-spacing:.1em!important;font-weight:600!important;opacity:0;transition:opacity .18s ease,border-color .18s ease;}',
-'  html.cf-web.cf-shop li.product:hover .ast-on-card-button{opacity:1;}',
-'  html.cf-web.cf-shop .ast-on-card-button:hover{border-color:var(--cf-red)!important;color:#fff!important;}',
+/* Astra renders TWO add-to-cart links per card. Drop the hover-overlay
+   duplicate and let the real one be the button - this store is here to sell. */
+'  html.cf-web.cf-shop .ast-on-card-button{display:none!important;}',
+'  html.cf-web.cf-shop .astra-shop-summary-wrap > a.button.add_to_cart_button,',
+'  html.cf-web.cf-shop li.product a.button.add_to_cart_button{display:block;width:100%;box-sizing:border-box;text-align:center;margin:12px 0 0!important;background:transparent!important;color:var(--cf-ink)!important;border:1px solid var(--cf-line2)!important;border-radius:2px!important;font-family:var(--cf-disp)!important;font-size:12px!important;letter-spacing:.1em!important;font-weight:600!important;padding:11px 14px!important;text-transform:uppercase;transition:background .15s ease,border-color .15s ease;}',
+'  html.cf-web.cf-shop li.product:hover a.button.add_to_cart_button{background:var(--cf-red)!important;border-color:var(--cf-red)!important;color:#fff!important;}',
+'  html.cf-web.cf-shop li.product a.button.add_to_cart_button:focus-visible{outline:2px solid var(--cf-red-lift);outline-offset:2px;}',
+'  html.cf-web.cf-shop .astra-shop-summary-wrap{display:flex;flex-direction:column;align-items:flex-start;}',
+'  html.cf-web.cf-shop .ast-loop-product__link{display:block;width:100%;}',
 
 /* pagination */
 '  html.cf-web .woocommerce-pagination ul{border:0!important;display:flex;gap:6px;justify-content:center;margin-top:48px;}',
@@ -381,6 +392,10 @@
       if (order) head.appendChild(order);
       if (title) title.style.display = 'none';
       wrap.insertBefore(head, wrap.firstChild);
+
+      /* breadcrumb belongs above the title, not stranded between it and the grid */
+      var bc = $('.woocommerce-breadcrumb');
+      if (bc) wrap.insertBefore(bc, head);
     })();
 
     /* ---- generation filter at the top of the rail ---- */
@@ -423,18 +438,42 @@
     li.__cf = 1;
 
     var gen = genOf(li);
-    var title = $('.woocommerce-loop-product__title, h2', li);
 
-    if (gen && title && !$('.cf-fitchip', li)) {
+    /* badge goes on the image, not inside the product link's text */
+    var shot = $('.astra-shop-thumbnail-wrap', li);
+    if (gen && shot && !$('.cf-fitchip', li)) {
       var chip = el('span', 'cf-fitchip', gen.label);
       if (garageMatches(gen.slug, g)) {
         chip.className += ' cf-fitchip-on';
-        chip.textContent = 'FITS YOUR BIKE';
+        chip.textContent = 'Fits your bike';
       }
-      title.parentNode.insertBefore(chip, title);
+      shot.appendChild(chip);
     }
 
+    shorten($('.woocommerce-loop-product__title, h2', li));
     fromPrice($('.price', li));
+  }
+
+  /* Titles are written for search. In a three-across grid the model string
+     repeats on every card and buries the part, so lead with the part. */
+  var MODEL_RUN = /^((?:BMW\s+)?(?:[MS]\d{3,4}\s*(?:RR|R|XR)?\s*[\/,]?\s*)+)(?:Carbon\s*Fib(?:er|re)\s*)?(.+)$/i;
+
+  function shortText(full) {
+    var m = String(full).trim().match(MODEL_RUN);
+    if (!m || !m[2]) return null;
+    var tail = m[2].trim();
+    if (tail.length < 4) return null;
+    return tail;
+  }
+
+  function shorten(node) {
+    if (!node || node.__cf) return;
+    var full = node.textContent.trim();
+    var tail = shortText(full);
+    if (!tail) return;
+    node.__cf = 1;
+    node.textContent = tail;
+    node.title = full;
   }
 
   /* A range at the moment of interest is a question, not an answer.
@@ -538,11 +577,11 @@
     var h1 = $('h1.product_title');
     if (!h1 || h1.__cf) return;
     var full = h1.textContent.trim();
-    /* strip a leading run of model names: "BMW M1000RR S1000R S1000RR Carbon Fiber Aero Disc Covers" */
-    var m = full.match(/^((?:BMW\s+)?(?:[MS]\d{3,4}(?:RR|R|XR)\s*)+)(?:Carbon\s*Fib(?:er|re)\s*)?(.+)$/i);
-    if (!m || !m[2] || m[2].trim().length < 3) return;
+    var tail = shortText(full);
+    if (!tail) return;
     h1.__cf = 1;
-    h1.textContent = m[2].trim();
+    h1.textContent = tail;
+    /* the full string stays on the page for search, just not as the headline */
     h1.appendChild(el('span', 'cf-kw', full));
   }
 
