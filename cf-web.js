@@ -67,6 +67,22 @@
 '  background-size:10px 10px;',
 '}',
 
+/* Woo leaves the add-to-cart row display:block while the quantity box
+   and the button both float, so the row collapses and the shipping
+   nudge this file injects renders straight THROUGH the quantity input
+   - measured at 375px AND at 1440px - while the button spills out
+   below the container. Flex-wrap stacks the three in DOM order
+   (quantity, shipping nudge, CTA) and gives the CTA the whole column.
+   form.cart is only safe to flex when it is NOT a variations form; on
+   a variable product it also wraps the attribute table. min-width is
+   what actually fills the line: flex-basis:100% alone measured 300px
+   of a 335px column. Row gap only - a zero-width sibling ahead of the
+   quantity box collects a column gap and indents it out of line. */
+'html.cf-web.cf-pdp .woocommerce-variation-add-to-cart,html.cf-web.cf-pdp form.cart:not(.variations_form){display:flex!important;flex-wrap:wrap;gap:10px 0!important;}',
+'html.cf-web.cf-pdp .woocommerce-variation-add-to-cart .quantity,html.cf-web.cf-pdp form.cart:not(.variations_form) .quantity{flex:0 0 100%!important;margin:0!important;}',
+'html.cf-web.cf-pdp .cf-ship{flex:1 0 100%!important;}',
+'html.cf-web.cf-pdp .single_add_to_cart_button{flex:1 0 100%!important;width:100%!important;min-width:100%!important;box-sizing:border-box!important;margin:0!important;}',
+
 '@media (min-width:769px){',
 
 /* ---------- page ground ---------- */
@@ -270,8 +286,16 @@
 '  html.cf-web.cf-pdp .StripeElement{margin:4px 0 18px!important;}',
 '  html.cf-web.cf-pdp .cf-sw button{flex:0 0 auto;min-width:104px;}',
 '  html.cf-web.cf-pdp .cf-trustrow{display:flex!important;flex-wrap:wrap;gap:8px;margin:18px 0 0;}',
-'  html.cf-web.cf-pdp .cf-trustrow a,html.cf-web.cf-pdp .cf-trustrow span{font-size:11px;color:var(--cfw-mute);border:1px solid var(--cfw-line);border-radius:2px;padding:6px 10px;text-decoration:none;}',
-'  html.cf-web.cf-pdp .cf-trustrow a:hover{border-color:var(--cfw-line2);color:var(--cfw-ink);}',
+/* "> a, > span" on purpose: .cf-trust-sub is nested INSIDE a chip, and
+   the old descendant selector gave it its own border and padding. */
+'  html.cf-web.cf-pdp .cf-trustrow > a,html.cf-web.cf-pdp .cf-trustrow > span{display:inline-flex;align-items:center;gap:7px;font-size:11px;line-height:1.3;white-space:nowrap;color:var(--cfw-mute);border:1px solid var(--cfw-line);border-radius:2px;padding:7px 10px;text-decoration:none;}',
+'  html.cf-web.cf-pdp .cf-trustrow > a:hover{border-color:var(--cfw-line2);color:var(--cfw-ink);}',
+/* the chips ship inline SVGs carrying a viewBox and no width/height, so
+   each icon sized itself to the flex line: measured 78x78, which blew
+   every chip out to 91px tall and wrapped the labels onto three lines. */
+'  html.cf-web.cf-pdp .cf-trust-ic{width:14px;height:14px;flex:0 0 14px;display:block;}',
+'  html.cf-web.cf-pdp .cf-trust-key .cf-trust-ic{color:var(--cfw-red);}',
+'  html.cf-web.cf-pdp .cf-trustrow .cf-trust-sub{border:0;padding:0;color:var(--cfw-faint);}',
 '  html.cf-web.cf-pdp .cf-paytrust-pdp{margin-top:14px;opacity:.85;}',
 
 /* tabs */
@@ -356,6 +380,10 @@
 '  html.cf-web .cf-fitbox-s{font-size:11.5px;}',
 '  html.cf-web .cf-sw button{flex:1 1 90px;min-width:84px;font-size:11.5px;}',
 '  html.cf-web .cf-sw i{height:30px;}',
+
+/* the touch-target half of the add-to-cart fix; the layout half is
+   unscoped above because the same overlap happens at every width. */
+'  html.cf-web.cf-pdp .single_add_to_cart_button{min-height:52px;font-size:14px!important;}',
 
 /* Astra leaves 68px of margin above and below the main column on
    phones, so the breadcrumb floated in dead space under the red bar.
@@ -590,6 +618,7 @@
     var product = $('div.product');
     if (!product) return;
     R.classList.add('cf-pdp');
+    ctaLabel(form);
 
     demoteKeywords();
 
@@ -834,6 +863,36 @@
     });
     mo.observe(D.body, { childList: true, subtree: true });
     setTimeout(function () { mo.disconnect(); }, 6000);
+  }
+
+  /* Woo disables Add to cart until every attribute is chosen, but leaves
+     the label reading "Add to cart", so a greyed-out button with no
+     explanation looks broken rather than like a step you have not done.
+     Name the step instead, using the product's own attribute labels. */
+  function ctaLabel(form) {
+    var btn = $('.single_add_to_cart_button');
+    if (!btn) return;
+    var ready = btn.textContent.trim() || 'Add to cart';
+    var waiting = 'Choose your options';
+    if (form) {
+      var names = $$('.variations label', form).map(function (l) {
+        return l.textContent.replace(/\s+/g, ' ').replace(/:$/, '').trim().toLowerCase();
+      }).filter(Boolean);
+      if (names.length === 1) waiting = 'Choose ' + names[0];
+      else if (names.length > 1) {
+        waiting = 'Choose ' + names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+      }
+    }
+    function sync() {
+      var need = /(^|\s)(disabled|wc-variation-selection-needed)(\s|$)/.test(btn.className);
+      var want = need ? waiting : ready;
+      if (btn.textContent.trim() !== want) btn.textContent = want;
+    }
+    sync();
+    /* class-only, so our own textContent write cannot re-trigger it */
+    if (window.MutationObserver) {
+      new MutationObserver(sync).observe(btn, { attributes: true, attributeFilter: ['class'] });
+    }
   }
 
   function boot() {
