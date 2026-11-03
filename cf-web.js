@@ -108,6 +108,22 @@
 'html.cf-web .cf-sw button.cf-sw-off{opacity:.38;}',
 'html.cf-web .cf-sw button.cf-sw-off i{filter:grayscale(1);}',
 
+/* The shop's filter rail is wired to Astra's sidebar, so it renders on
+   the CART and CHECKOUT too - 360px of part-type links beside the one
+   page whose only job is to take the money, and on a phone the same
+   thing as a floating "Filters" pill sitting on top of the cart. The
+   rail itself is site-level markup (#cf-filter-btn is not built by this
+   file), so this just keeps it off the two conversion pages and gives
+   the content the width the sidebar was holding. */
+'html.cf-web body.woocommerce-cart #secondary,html.cf-web body.woocommerce-checkout #secondary{display:none!important;}',
+'html.cf-web body.woocommerce-cart #primary,html.cf-web body.woocommerce-checkout #primary{width:100%!important;max-width:100%!important;}',
+'html.cf-web body.woocommerce-cart #cf-filter-btn,html.cf-web body.woocommerce-checkout #cf-filter-btn{display:none!important;}',
+
+/* Astra's back-to-top chip ships its own blue (#046BD2), which is the
+   one saturated colour on the site that is not ours. */
+'html.cf-web #ast-scroll-top{background:var(--cfw-raise2)!important;color:var(--cfw-ink)!important;border:1px solid var(--cfw-line2);border-radius:2px;}',
+'html.cf-web #ast-scroll-top:hover{background:var(--cfw-red)!important;color:#FFFFFF!important;border-color:var(--cfw-red)!important;}',
+
 '@media (min-width:769px){',
 
 /* ---------- page ground ---------- */
@@ -337,6 +353,16 @@
 '  html.cf-web select,html.cf-web input[type=text],html.cf-web input[type=email],html.cf-web input[type=search],html.cf-web textarea{background:var(--cfw-raise);color:var(--cfw-ink);border:1px solid var(--cfw-line);border-radius:2px;}',
 '  html.cf-web .star-rating span::before{color:var(--cfw-red);}',
 
+
+  /* With the sidebar gone the cart had one line item stretched across
+     1139px and the totals stranded below it. Two columns instead, so
+     the totals card - and the express-pay buttons under it - sit beside
+     the items and above the fold. Mobile keeps the stacked order. */
+'  html.cf-web body.woocommerce-cart .woocommerce{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px 26px;align-items:start;}',
+'  html.cf-web body.woocommerce-cart .woocommerce-notices-wrapper{grid-column:1/-1;}',
+'  html.cf-web body.woocommerce-cart wc-order-attribution-inputs{grid-column:1/-1;}',
+'  html.cf-web body.woocommerce-cart .cart-collaterals{width:auto!important;float:none!important;margin:0!important;}',
+'  html.cf-web body.woocommerce-cart .cart-collaterals .cart_totals{width:auto!important;float:none!important;position:sticky;top:96px;}',
 '}', /* end min-width:769px */
 
 /* ------------------------------------------------------------------ */
