@@ -83,6 +83,31 @@
 'html.cf-web.cf-pdp .cf-ship{flex:1 0 100%!important;}',
 'html.cf-web.cf-pdp .single_add_to_cart_button{flex:1 0 100%!important;width:100%!important;min-width:100%!important;box-sizing:border-box!important;margin:0!important;}',
 
+
+/* The swatch layer is built by this file (it hides the native select
+   and draws the finish/weave tiles), but every one of these rules used
+   to sit inside the desktop media query - so on a phone the raw white
+   <select> stayed on screen AND the tiles fell back to default blue UA
+   buttons, on the one page that has to sell. They are width-agnostic,
+   so they belong here; the mobile block below still overrides the two
+   that are genuinely size-specific (button flex, swatch tile height). */
+'html.cf-web.cf-pdp .cf-sw-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}',
+'html.cf-web .cf-sw{display:flex;flex-wrap:wrap;gap:9px;}',
+'html.cf-web .cf-sw button{flex:0 1 112px;min-width:92px;padding:0 0 2px;background:var(--cfw-raise);color:var(--cfw-ink);border:1px solid var(--cfw-line2);border-radius:2px;cursor:pointer;font-family:var(--cfw-body);font-size:12px;text-align:center;transition:border-color .15s ease,box-shadow .15s ease;}',
+'html.cf-web .cf-sw button:hover{border-color:var(--cfw-mute);}',
+'html.cf-web .cf-sw button[aria-pressed="true"]{border-color:var(--cfw-red);box-shadow:inset 0 0 0 1px var(--cfw-red);}',
+'html.cf-web .cf-sw button:focus-visible{outline:2px solid var(--cfw-red-lift);outline-offset:2px;}',
+'html.cf-web .cf-sw i{display:block;height:34px;border-bottom:1px solid var(--cfw-line);}',
+'html.cf-web .cf-sw span{display:block;padding:7px 4px;}',
+'html.cf-web .cf-sw-glossy{background:linear-gradient(135deg,#2C2C33 0%,#121214 58%,#36363E 100%);}',
+'html.cf-web .cf-sw-matt{background:linear-gradient(135deg,#1C1C20 0%,#141416 100%);}',
+'html.cf-web .cf-sw-twill{background-color:#0C0C0E;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.055) 0 2px,transparent 2px 5px),repeating-linear-gradient(-45deg,rgba(255,255,255,.04) 0 2px,transparent 2px 5px);background-size:10px 10px;}',
+'html.cf-web .cf-sw-plain{background-color:#0C0C0E;background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 2px,transparent 2px 6px),repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 2px,transparent 2px 6px);background-size:12px 12px;}',
+'html.cf-web .cf-sw-forged{background:#141417;background-image:radial-gradient(circle at 28% 38%,rgba(255,255,255,.11) 0 3px,transparent 4px),radial-gradient(circle at 68% 64%,rgba(255,255,255,.085) 0 4px,transparent 5px),radial-gradient(circle at 46% 80%,rgba(255,255,255,.07) 0 3px,transparent 4px);}',
+'html.cf-web .cf-sw-honeycomb{background-color:#0E0E11;background-image:repeating-linear-gradient(60deg,rgba(255,255,255,.055) 0 1px,transparent 1px 9px),repeating-linear-gradient(-60deg,rgba(255,255,255,.055) 0 1px,transparent 1px 9px),repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 1px,transparent 1px 9px);}',
+'html.cf-web .cf-sw button.cf-sw-off{opacity:.38;}',
+'html.cf-web .cf-sw button.cf-sw-off i{filter:grayscale(1);}',
+
 '@media (min-width:769px){',
 
 /* ---------- page ground ---------- */
@@ -238,22 +263,6 @@
 '  html.cf-web.cf-pdp table.variations tbody,html.cf-web.cf-pdp table.variations tr,html.cf-web.cf-pdp table.variations td,html.cf-web.cf-pdp table.variations th{display:block;border:0;padding:0;background:transparent;width:auto;}',
 '  html.cf-web.cf-pdp table.variations tr{margin-bottom:18px;}',
 '  html.cf-web.cf-pdp table.variations label{font-family:var(--cfw-disp);font-size:11px;font-weight:600;letter-spacing:.16em;color:var(--cfw-mute);text-transform:uppercase;display:block;margin-bottom:10px;}',
-'  html.cf-web.cf-pdp .cf-sw-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}',
-'  html.cf-web .cf-sw{display:flex;flex-wrap:wrap;gap:9px;}',
-'  html.cf-web .cf-sw button{flex:0 1 112px;min-width:92px;padding:0 0 2px;background:var(--cfw-raise);color:var(--cfw-ink);border:1px solid var(--cfw-line2);border-radius:2px;cursor:pointer;font-family:var(--cfw-body);font-size:12px;text-align:center;transition:border-color .15s ease,box-shadow .15s ease;}',
-'  html.cf-web .cf-sw button:hover{border-color:var(--cfw-mute);}',
-'  html.cf-web .cf-sw button[aria-pressed="true"]{border-color:var(--cfw-red);box-shadow:inset 0 0 0 1px var(--cfw-red);}',
-'  html.cf-web .cf-sw button:focus-visible{outline:2px solid var(--cfw-red-lift);outline-offset:2px;}',
-'  html.cf-web .cf-sw i{display:block;height:34px;border-bottom:1px solid var(--cfw-line);}',
-'  html.cf-web .cf-sw span{display:block;padding:7px 4px;}',
-'  html.cf-web .cf-sw-glossy{background:linear-gradient(135deg,#2C2C33 0%,#121214 58%,#36363E 100%);}',
-'  html.cf-web .cf-sw-matt{background:linear-gradient(135deg,#1C1C20 0%,#141416 100%);}',
-'  html.cf-web .cf-sw-twill{background-color:#0C0C0E;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.055) 0 2px,transparent 2px 5px),repeating-linear-gradient(-45deg,rgba(255,255,255,.04) 0 2px,transparent 2px 5px);background-size:10px 10px;}',
-'  html.cf-web .cf-sw-plain{background-color:#0C0C0E;background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 2px,transparent 2px 6px),repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 2px,transparent 2px 6px);background-size:12px 12px;}',
-'  html.cf-web .cf-sw-forged{background:#141417;background-image:radial-gradient(circle at 28% 38%,rgba(255,255,255,.11) 0 3px,transparent 4px),radial-gradient(circle at 68% 64%,rgba(255,255,255,.085) 0 4px,transparent 5px),radial-gradient(circle at 46% 80%,rgba(255,255,255,.07) 0 3px,transparent 4px);}',
-'  html.cf-web .cf-sw-honeycomb{background-color:#0E0E11;background-image:repeating-linear-gradient(60deg,rgba(255,255,255,.055) 0 1px,transparent 1px 9px),repeating-linear-gradient(-60deg,rgba(255,255,255,.055) 0 1px,transparent 1px 9px),repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 1px,transparent 1px 9px);}',
-'  html.cf-web .cf-sw button.cf-sw-off{opacity:.38;}',
-'  html.cf-web .cf-sw button.cf-sw-off i{filter:grayscale(1);}',
 
 '  html.cf-web.cf-pdp .reset_variations{font-size:12px;color:var(--cfw-faint);}',
 '  html.cf-web.cf-pdp .woocommerce-variation-price{display:none;}',
