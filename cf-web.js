@@ -124,6 +124,16 @@
 'html.cf-web #ast-scroll-top{background:var(--cfw-raise2)!important;color:var(--cfw-ink)!important;border:1px solid var(--cfw-line2);border-radius:2px;}',
 'html.cf-web #ast-scroll-top:hover{background:var(--cfw-red)!important;color:#FFFFFF!important;border-color:var(--cfw-red)!important;}',
 
+/* ---------- contrast floor ---------- */
+
+/* Two labels failed the 4.5:1 floor at 390px, both measured against the card
+   they sit on. The "from" price label was ours at 3.42:1 (--cfw-faint is a
+   hairline colour, fine for rules, too dim for 10px text) - moved to
+   --cfw-mute, 6.4:1. The product category under each related product is
+   Astra's own #2a313c on our #1c1917 card: 1.33:1, which is not dim, it is
+   gone. Same token, same reason. */
+'html.cf-web .ast-woo-product-category,html.cf-web .ast-woo-product-category a{color:var(--cfw-mute)!important;}',
+
 /* ---------- checkout ---------- */
 
 /* Two merchandising bars this skin pins to the viewport belong on the
@@ -278,7 +288,7 @@
 '  html.cf-web.cf-shop ul.products li.product h2{font-family:var(--cfw-body)!important;font-size:14px!important;line-height:1.42;font-weight:500;color:var(--cfw-ink);margin:14px 0 6px!important;padding:0!important;}',
 '  html.cf-web.cf-shop ul.products li.product .price{font-family:var(--cfw-disp)!important;font-size:16px!important;font-weight:600;color:var(--cfw-ink)!important;display:block;margin:0;}',
 '  html.cf-web.cf-shop ul.products li.product .price del{display:none;}',
-'  html.cf-web .cf-from{font-family:var(--cfw-body);font-size:11px;font-weight:500;letter-spacing:.08em;color:var(--cfw-faint);margin-right:6px;text-transform:uppercase;}',
+'  html.cf-web .cf-from{font-family:var(--cfw-body);font-size:11px;font-weight:500;letter-spacing:.08em;color:var(--cfw-mute);margin-right:6px;text-transform:uppercase;}',
 
 /* generation badge, sitting on the image as a badge rather than in the link text */
 '  html.cf-web .cf-fitchip{position:absolute;top:10px;left:10px;z-index:2;font-family:var(--cfw-body);font-size:10px;font-weight:600;letter-spacing:.09em;color:var(--cfw-mute);background:rgba(8,8,10,.84);backdrop-filter:blur(3px);border:1px solid var(--cfw-line);border-radius:2px;padding:4px 8px;text-transform:uppercase;}',
@@ -447,7 +457,7 @@
 /* was position:static on a phone, so it sat in the flow and deformed the card */
 '  html.cf-web .cf-fitchip{position:absolute;top:7px;left:7px;z-index:2;font-family:var(--cfw-body);font-size:9px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--cfw-mute);background:rgba(8,8,10,.86);border:1px solid var(--cfw-line);border-radius:2px;padding:3px 6px;line-height:1.1;}',
 '  html.cf-web .cf-fitchip.cf-fitchip-on{color:#FFFFFF;background:var(--cfw-red);border-color:var(--cfw-red);}',
-'  html.cf-web .cf-from{font-family:var(--cfw-body);font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--cfw-faint);margin-right:5px;}',
+'  html.cf-web .cf-from{font-family:var(--cfw-body);font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--cfw-mute);margin-right:5px;}',
 
 /* the keyword string is for search, not for a 158px card */
 '  html.cf-web.cf-shop ul.products li.product .cf-kw{display:none;}',

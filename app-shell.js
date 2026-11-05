@@ -849,6 +849,8 @@
     var sbody = sortSheet.querySelector('.cf-filters-body');
     var list = d.createElement('div');
     list.className = 'cf-filters-sortlist';
+    // the options below are role=menuitemradio; without this they are orphans
+    list.setAttribute('role', 'menu');
     Array.prototype.forEach.call(orderingSelect.options, function (opt) {
       var btn = d.createElement('button');
       btn.type = 'button';
@@ -2136,6 +2138,6 @@
    Disable by removing these lines, or per-visit with ?cf_web=off. ---- */
 (function(){ if(document.getElementById('cf-web-js')) return;
   var s=document.createElement('script'); s.id='cf-web-js'; s.async=false;
-  s.src='https://cdn.jsdelivr.net/gh/knifette/cf-app-shell@v1.1.13/cf-web.js';
+  s.src='https://cdn.jsdelivr.net/gh/knifette/cf-app-shell@v1.1.14/cf-web.js';
   (document.head||document.documentElement).appendChild(s);
 })();
