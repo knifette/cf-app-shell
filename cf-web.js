@@ -132,7 +132,7 @@
    --cfw-mute, 6.4:1. The product category under each related product is
    Astra's own #2a313c on our #1c1917 card: 1.33:1, which is not dim, it is
    gone. Same token, same reason. */
-'html.cf-web .ast-woo-product-category,html.cf-web .ast-woo-product-category a{color:var(--cfw-mute)!important;}',
+'html.cf-web .ast-woo-product-category,html.cf-web .ast-woo-product-category a{color:var(--cfw-mute)!important;opacity:1!important;}',
 
 /* ---------- checkout ---------- */
 
