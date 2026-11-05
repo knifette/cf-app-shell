@@ -124,6 +124,44 @@
 'html.cf-web #ast-scroll-top{background:var(--cfw-raise2)!important;color:var(--cfw-ink)!important;border:1px solid var(--cfw-line2);border-radius:2px;}',
 'html.cf-web #ast-scroll-top:hover{background:var(--cfw-red)!important;color:#FFFFFF!important;border-color:var(--cfw-red)!important;}',
 
+/* ---------- checkout ---------- */
+
+/* Two merchandising bars this skin pins to the viewport belong on the
+   shop and the product page, not on the checkout. The garage pill is a
+   sticky 72px "Shop by bike - find parts that fit" bar: on the one page
+   where the job is to finish, it sits over the top of the form and
+   invites the shopper back out to browsing. The free-shipping nudge is
+   worth keeping on the cart - measured there, it clears the Proceed to
+   checkout button and you can still add items - but from the checkout
+   there is no add-items path, so it is just a bar over the order. */
+'html.cf-web body.woocommerce-checkout .cf-grg-pillwrap{display:none!important;}',
+'html.cf-web body.woocommerce-checkout .cf-ship-bar.cf-ship-sticky{display:none!important;}',
+
+/* Two strings on the checkout are invisible, both measured against their
+   own painted background: the PayPal gateway's instruction paragraph
+   ("Enter your email address above to continue.") at 1.12:1, and the
+   "+ 3" overflow counter on the card-logo row at 1.05:1. Both are plain
+   DOM the plugins colour for a light theme - near-black on our near-
+   black - so the one instruction the buyer needs is a blank box. */
+'html.cf-web body.woocommerce-checkout .payment_box p{color:inherit!important;}',
+'html.cf-web body.woocommerce-checkout .payment-methods--logos-count{color:var(--cfw-ink)!important;}',
+
+/* The payment radios and the privacy checkbox are the browser's own
+   13px controls, so they paint bright white on a black page and read as
+   the only unstyled thing in the funnel. accent-color brands them
+   without replacing the native control (and keeps the hit target). */
+'html.cf-web body.woocommerce-checkout input[type="radio"],html.cf-web body.woocommerce-checkout input[type="checkbox"]{accent-color:var(--cfw-red);}',
+'html.cf-web body.woocommerce-checkout #_woo_additional_terms{width:18px;height:18px;}',
+
+/* Place order was the smallest button in the funnel - measured 263x41
+   at 375px, against 294x63 for Proceed to checkout and the 335x52 Add
+   to cart - and under the 44px touch floor. The last button should not
+   be the one you have to aim at. (It was never narrow by its own rule:
+   it already filled its parent. The width came back with the order
+   panel's padding, in the mobile block below.) */
+'html.cf-web body.woocommerce-checkout #place_order{min-height:52px;}',
+
+
 '@media (min-width:769px){',
 
 /* ---------- page ground ---------- */
@@ -374,6 +412,13 @@
 /* Width-scoped, so the native app gets the same look (platform parity).*/
 /* ------------------------------------------------------------------ */
 '@media (max-width:768px){',
+
+  /* 34px of side padding on the order panel is a desktop number: on a
+     375 phone it ate 68 of the 335 column, which is why Place order
+     measured 263 wide. 18px gives the totals, the payment rows and the
+     button back 32px without crowding the card edge. */
+'  html.cf-web body.woocommerce-checkout #order_review{padding-left:18px!important;padding-right:18px!important;}',
+
 
 /* the announcement bar rendered as 53px of unstyled text before this */
 '  html.cf-web .cf-ann{display:flex;align-items:center;justify-content:center;gap:0;background:var(--cfw-red);color:#FFFFFF;font-family:var(--cfw-disp);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;text-align:center;padding:7px 12px;line-height:1.2;}',
