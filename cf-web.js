@@ -161,6 +161,18 @@
    panel's padding, in the mobile block below.) */
 'html.cf-web body.woocommerce-checkout #place_order{min-height:52px;}',
 
+/* Billing details only became reachable today. PayPal Fastlane used to hide
+   the whole form behind an email gate, so the one part of the checkout the
+   buyer actually types into had never been looked at: nine rows at Woo's
+   default 40px, every one of them under the 44px touch floor, on the page
+   that takes the money. 48 lines them up with Place order and the express
+   buttons above. The select carries the country and state dropdowns. */
+'html.cf-web body.woocommerce-checkout #customer_details input[type="text"],html.cf-web body.woocommerce-checkout #customer_details input[type="email"],html.cf-web body.woocommerce-checkout #customer_details input[type="tel"],html.cf-web body.woocommerce-checkout #customer_details select{min-height:48px;}',
+
+/* Same native 13px box as the terms checkbox branded in 1.1.12 - this one
+   was behind the email gate, so it was missed. */
+'html.cf-web body.woocommerce-checkout #ship-to-different-address-checkbox{width:18px;height:18px;}',
+
 
 '@media (min-width:769px){',
 
