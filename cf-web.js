@@ -519,6 +519,8 @@
   /* nothing else. Kill switch: ?cf_pl=off.                              */
   /* ------------------------------------------------------------------ */
   var PL = [
+/* the store layer is desktop-web only: <=768 and the native app keep the app skin */
+'@media (min-width:769px){',
 'html.cf-web.cf-pl{',
 '  --cfw-ground:#ECEDEF; --cfw-raise:#FFFFFF; --cfw-raise2:#F4F5F6; --cfw-line:#D9DBDF; --cfw-line2:#BFC2C8;',
 '  --cfw-ink:#141518; --cfw-mute:#50545C; --cfw-faint:#5F636B; --cfw-red:#D0140C; --cfw-red-lift:#A30F08;',
@@ -591,6 +593,7 @@
 'html.cf-web.cf-pl.cf-pdp form.cart .single_add_to_cart_button{background:var(--cfw-red)!important;border-radius:4px!important;}',
 'html.cf-web.cf-pl.cf-pdp form.cart .single_add_to_cart_button:hover{background:var(--cfw-red-lift)!important;}',
 
+'}',
 /* ================================================================== */
 /* HOMEPAGE - drawn by home() from live store data                     */
 /* ================================================================== */
@@ -1335,7 +1338,7 @@
 
   function boot() {
     R.classList.add('cf-web');
-    if (PLON) R.classList.add('cf-pl');
+    if (PLON && !R.classList.contains('cf-native')) R.classList.add('cf-pl');
     injectCSS();
     announce();
     countFix();
