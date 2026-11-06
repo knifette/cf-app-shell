@@ -23,6 +23,10 @@
     if (location.search.indexOf('cf_web=off') > -1) return;
   } catch (e) {}
 
+  /* Pit Lane look (v1.2.0); ?cf_pl=off shows the previous dark skin */
+  var PLON = true;
+  try { if (location.search.indexOf('cf_pl=off') > -1) PLON = false; } catch (e) {}
+
   var FREESHIP = 600; // live WooCommerce rule, confirmed on the store
 
   /* <=768px is the app skin's scope (see the WordPress app-skin protocol):
@@ -37,7 +41,7 @@
     var l = D.createElement('link');
     l.id = 'cf-web-fonts';
     l.rel = 'stylesheet';
-    l.href = 'https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap';
+    l.href = 'https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap';
     (D.head || R).appendChild(l);
   })();
 
@@ -506,11 +510,160 @@
 '}'
   ].join('\n');
 
+  /* ------------------------------------------------------------------ */
+  /* PIT LANE (v1.2.0) - the flagship look, layered on top of the dark   */
+  /* skin above so every working fix underneath (prices, swatches, the   */
+  /* checkout) is kept. Night is the header, hero and footer; the store  */
+  /* itself is a light studio, because the vendor photography (RPM and   */
+  /* Moto Composites) is shot on white. Red is the buy colour and        */
+  /* nothing else. Kill switch: ?cf_pl=off.                              */
+  /* ------------------------------------------------------------------ */
+  var PL = [
+'html.cf-web.cf-pl{',
+'  --cfw-ground:#ECEDEF; --cfw-raise:#FFFFFF; --cfw-raise2:#F4F5F6; --cfw-line:#D9DBDF; --cfw-line2:#BFC2C8;',
+'  --cfw-ink:#141518; --cfw-mute:#50545C; --cfw-faint:#5F636B; --cfw-red:#D0140C; --cfw-red-lift:#A30F08;',
+'  --cfw-night:#141518; --cfw-night-ink:#E9EAED; --cfw-night-mute:#A3A7AF;',
+'  --cfw-disp:"Archivo",system-ui,sans-serif; --cfw-body:"Archivo",system-ui,-apple-system,sans-serif;',
+'}',
+'html.cf-web.cf-pl, html.cf-web.cf-pl body{background:var(--cfw-ground);color:var(--cfw-ink);font-family:var(--cfw-body);}',
+
+/* one display voice: Archivo, italic, stretched - pit-board lettering */
+'html.cf-web.cf-pl.cf-shop .cf-head h1,html.cf-web.cf-pl.cf-pdp h1.product_title,html.cf-web.cf-pl .related > h2,html.cf-web.cf-pl .up-sells > h2,html.cf-web.cf-pl body.woocommerce-cart h1,html.cf-web.cf-pl body.woocommerce-checkout h1{font-family:var(--cfw-disp)!important;font-style:italic;font-weight:800!important;font-stretch:118%;letter-spacing:-.02em;}',
+
+/* announcement: night, not red - red belongs to the buy button */
+'html.cf-web.cf-pl .cf-ann{background:#26282D!important;color:#FFFFFF!important;}',
+'html.cf-web.cf-pl .cf-ann em{color:var(--cfw-night-mute)!important;}',
+
+/* header and footer stay night */
+'html.cf-web.cf-pl .site-header,html.cf-web.cf-pl .ast-main-header-wrap,html.cf-web.cf-pl .main-header-bar,html.cf-web.cf-pl .ast-primary-header-bar{background:var(--cfw-night)!important;border-bottom:0!important;box-shadow:none!important;}',
+'html.cf-web.cf-pl .site-header .main-header-menu > .menu-item > .menu-link,html.cf-web.cf-pl .site-header .ast-header-woo-cart a,html.cf-web.cf-pl .site-header .ast-site-header-cart a{color:var(--cfw-night-ink)!important;}',
+'html.cf-web.cf-pl .site-header .main-header-menu > .menu-item > .menu-link:hover{color:#FFFFFF!important;}',
+'html.cf-web.cf-pl .site-header .sub-menu{background:#FFFFFF!important;border:1px solid var(--cfw-line)!important;}',
+'html.cf-web.cf-pl .site-header .sub-menu .menu-link{color:var(--cfw-ink)!important;}',
+'html.cf-web.cf-pl footer.site-footer,html.cf-web.cf-pl .site-footer .ast-builder-grid-row-container,html.cf-web.cf-pl .site-footer .site-below-footer-wrap,html.cf-web.cf-pl .site-footer .site-primary-footer-wrap{background:var(--cfw-night)!important;border-top:0!important;color:var(--cfw-night-mute)!important;}',
+'html.cf-web.cf-pl footer.site-footer a{color:var(--cfw-night-mute)!important;}',
+'html.cf-web.cf-pl footer.site-footer a:hover{color:#FFFFFF!important;}',
+
+/* the white plate: every product photo sits on one */
+'html.cf-web.cf-pl.cf-shop .astra-shop-thumbnail-wrap,html.cf-web.cf-pl.cf-shop ul.products li.product img,html.cf-web.cf-pl.cf-pdp .woocommerce-product-gallery,html.cf-web.cf-pl.cf-pdp .woocommerce-product-gallery__image,html.cf-web.cf-pl.cf-pdp .woocommerce-product-gallery__wrapper,html.cf-web.cf-pl .related ul.products img,html.cf-web.cf-pl .up-sells ul.products img{background:#FFFFFF!important;border-color:transparent!important;border-radius:4px!important;}',
+'html.cf-web.cf-pl.cf-pdp .flex-control-thumbs img{background:#FFFFFF!important;border-radius:3px;}',
+
+/* cards: solid red buy button */
+'html.cf-web.cf-pl.cf-shop ul.products li.product a.button.add_to_cart_button,html.cf-web.cf-pl.cf-shop ul.products li.product a.button.product_type_variable,html.cf-web.cf-pl .related ul.products li.product a.button{background:var(--cfw-red)!important;border:0!important;color:#FFFFFF!important;border-radius:4px!important;text-transform:none!important;letter-spacing:0!important;font-weight:700!important;}',
+'html.cf-web.cf-pl.cf-shop ul.products li.product a.button:hover,html.cf-web.cf-pl .related ul.products li.product a.button:hover{background:var(--cfw-red-lift)!important;}',
+'html.cf-web.cf-pl .cf-fitchip{background:#F1F2F4!important;color:var(--cfw-ink)!important;border:0!important;backdrop-filter:none!important;}',
+'html.cf-web.cf-pl .cf-fitchip.cf-fitchip-on{background:var(--cfw-ink)!important;color:#FFFFFF!important;}',
+'html.cf-web.cf-pl .woocommerce-pagination .current{background:var(--cfw-ink)!important;border-color:var(--cfw-ink)!important;color:#FFFFFF!important;}',
+
+/* filter rail: ink marks the active filter, not red */
+'html.cf-web.cf-pl .cf-gen a.cf-on{color:var(--cfw-ink)!important;border-color:var(--cfw-ink)!important;}',
+'html.cf-web.cf-pl #secondary .button:hover,html.cf-web.cf-pl #secondary button:hover{background:var(--cfw-ink)!important;border-color:var(--cfw-ink)!important;color:#FFFFFF!important;}',
+'html.cf-web.cf-pl #secondary .ui-slider-range{background:var(--cfw-ink)!important;}',
+
+/* product page */
+'html.cf-web.cf-pl .cf-sw button[aria-pressed="true"]{border-color:var(--cfw-ink)!important;box-shadow:inset 0 0 0 1px var(--cfw-ink)!important;}',
+'html.cf-web.cf-pl .cf-ship-fill{background:var(--cfw-ink)!important;}',
+'html.cf-web.cf-pl .cf-fitbox{border-left-color:var(--cfw-ink)!important;background:#FFFFFF!important;}',
+'html.cf-web.cf-pl .cf-fitbox-k{background:var(--cfw-ink)!important;}',
+'html.cf-web.cf-pl .cf-fitbox a{color:var(--cfw-ink)!important;}',
+'html.cf-web.cf-pl .woocommerce-tabs ul.tabs li.active a,html.cf-web.cf-pl .woocommerce-tabs ul.tabs li.active{border-color:var(--cfw-ink)!important;color:var(--cfw-ink)!important;}',
+'html.cf-web.cf-pl .woocommerce-message,html.cf-web.cf-pl .woocommerce-info{background:#FFFFFF!important;border-top-color:var(--cfw-ink)!important;color:var(--cfw-ink)!important;}',
+'html.cf-web.cf-pl .woocommerce-message a,html.cf-web.cf-pl .woocommerce-info a{color:var(--cfw-ink)!important;}',
+'html.cf-web.cf-pl #ast-scroll-top{background:var(--cfw-ink)!important;border-color:var(--cfw-ink)!important;color:#FFFFFF!important;}',
+'html.cf-web.cf-pl body.woocommerce-checkout input[type="radio"],html.cf-web.cf-pl body.woocommerce-checkout input[type="checkbox"]{accent-color:var(--cfw-ink);}',
+'html.cf-web.cf-pl.cf-pdp form.cart .single_add_to_cart_button{background:var(--cfw-red)!important;border-radius:4px!important;}',
+'html.cf-web.cf-pl.cf-pdp form.cart .single_add_to_cart_button:hover{background:var(--cfw-red-lift)!important;}',
+
+/* ================================================================== */
+/* HOMEPAGE - drawn by home() from live store data                     */
+/* ================================================================== */
+'html.cf-home [data-elementor-type="wp-page"]{display:none!important;}',
+'html.cf-home, html.cf-home body{background:#ECEDEF!important;}',
+'#cf-home{font-family:"Archivo",system-ui,sans-serif;color:#141518;background:#ECEDEF;--g:clamp(16px,4vw,56px);font-size:16px;line-height:1.5;}',
+'#cf-home *{box-sizing:border-box;}',
+'#cf-home a{color:inherit;}',
+'#cf-home :focus-visible{outline:2px solid #141518;outline-offset:2px;}',
+'#cf-home .h-top :focus-visible,#cf-home .h-hero :focus-visible,#cf-home .h-foot :focus-visible{outline-color:#FFFFFF;}',
+'#cf-home .h-ann{background:#26282D;color:#FFFFFF;text-align:center;font-size:14px;padding:9px var(--g);}',
+'#cf-home .h-ann span{color:#A3A7AF;margin-left:8px;}',
+'#cf-home .h-top{background:#141518;color:#E9EAED;display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;padding:0 var(--g);min-height:72px;}',
+'#cf-home .h-top img{height:30px;width:auto;display:block;}',
+'#cf-home .h-top nav{display:flex;flex-wrap:wrap;gap:4px 28px;flex:1 1 auto;justify-content:flex-end;font-size:15px;font-weight:500;}',
+'#cf-home .h-top nav a{color:#E9EAED;text-decoration:none;min-height:44px;display:flex;align-items:center;}',
+'#cf-home .h-top nav a:hover{color:#FFFFFF;text-decoration:underline;text-underline-offset:6px;}',
+'#cf-home .h-hero{background:#141518;color:#FFFFFF;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:48px;align-items:center;padding:48px var(--g) 72px;}',
+'#cf-home h1{margin:0 0 24px;font-size:clamp(40px,5.4vw,80px);line-height:.96;font-weight:800;font-style:italic;font-stretch:118%;letter-spacing:-.02em;color:#FFFFFF;text-transform:none;}',
+'#cf-home .h-lede{margin:0 0 28px;font-size:18px;line-height:1.55;color:#C9CCD1;max-width:44ch;}',
+'#cf-home .h-pick{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin:0;}',
+'#cf-home .h-pick label{display:flex;flex-direction:column;gap:6px;font-size:14px;color:#A3A7AF;margin:0;}',
+'#cf-home .h-pick select{min-height:52px;min-width:160px;padding:0 14px;font:inherit;font-size:16px;background:#FFFFFF;color:#141518;border:0;border-radius:4px;margin:0;}',
+'#cf-home .h-go{min-height:52px;padding:0 26px;font:inherit;font-size:16px;font-weight:700;background:#FFFFFF;color:#141518;border:0;border-radius:4px;cursor:pointer;text-transform:none;letter-spacing:0;}',
+'#cf-home .h-go:hover{background:#D9DBDF;color:#141518;}',
+'#cf-home .h-hint{margin:14px 0 0;font-size:14px;color:#A3A7AF;}',
+'#cf-home .h-hint a,#cf-home .h-shot figcaption a{color:#E9EAED;}',
+'#cf-home .h-shot{margin:0;}',
+'#cf-home .h-shot img{display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:4px;}',
+'#cf-home .h-shot figcaption{margin-top:10px;font-size:14px;color:#A3A7AF;}',
+'#cf-home .h-sec{padding:64px var(--g) 0;}',
+'#cf-home h2{margin:0 0 20px;font-size:clamp(26px,3vw,36px);line-height:1.05;font-weight:800;font-style:italic;font-stretch:112%;letter-spacing:-.01em;color:#141518;text-transform:none;}',
+'#cf-home .h-areas{display:flex;flex-wrap:wrap;gap:10px;min-height:48px;}',
+'#cf-home .h-areas a{min-height:48px;padding:0 18px;display:flex;align-items:center;gap:10px;background:#FFFFFF;border-radius:4px;text-decoration:none;font-weight:600;font-size:15px;}',
+'#cf-home .h-areas a:hover{box-shadow:inset 0 0 0 1px #141518;}',
+'#cf-home .h-areas span{color:#50545C;font-weight:400;font-variant-numeric:tabular-nums;}',
+'#cf-home .h-gridhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 24px;}',
+'#cf-home .h-gridhead a{font-weight:600;min-height:44px;display:inline-flex;align-items:center;}',
+'#cf-home .h-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:32px 20px;}',
+'#cf-home .h-grid[aria-busy]{min-height:420px;}',
+'#cf-home .h-card{display:flex;flex-direction:column;gap:6px;}',
+'#cf-home .h-plate{display:block;background:#FFFFFF;border-radius:4px;aspect-ratio:1/1;overflow:hidden;}',
+'#cf-home .h-plate img{display:block;width:100%;height:100%;object-fit:contain;transition:transform .3s cubic-bezier(.2,.7,.2,1);}',
+'#cf-home .h-card:hover .h-plate img{transform:scale(1.03);}',
+'#cf-home .h-card h3{margin:8px 0 0;font-size:16px;line-height:1.3;font-weight:600;color:#141518;font-family:inherit;}',
+'#cf-home .h-card h3 a{text-decoration:none;}',
+'#cf-home .h-card h3 a:hover{text-decoration:underline;}',
+'#cf-home .h-fit{margin:0;font-size:14px;color:#50545C;}',
+'#cf-home .h-buy{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;flex-wrap:wrap;}',
+'#cf-home .h-price{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;}',
+'#cf-home .h-price small{font-size:13px;font-weight:500;color:#50545C;margin-right:5px;}',
+'#cf-home .h-cta{min-height:44px;padding:0 16px;display:flex;align-items:center;justify-content:center;background:#D0140C;color:#FFFFFF!important;border-radius:4px;text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap;}',
+'#cf-home .h-cta:hover{background:#A30F08;}',
+'#cf-home .h-facts{margin-top:72px;background:#FFFFFF;padding:40px var(--g);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 48px;}',
+'#cf-home .h-facts p{margin:0;font-size:16px;line-height:1.55;max-width:38ch;color:#50545C;}',
+'#cf-home .h-facts b{display:block;color:#141518;font-size:17px;margin-bottom:4px;}',
+'#cf-home .h-facts a{color:#141518;}',
+'#cf-home .h-foot{background:#141518;color:#A3A7AF;padding:32px var(--g);display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;align-items:center;font-size:14px;}',
+'#cf-home .h-foot img{height:24px;width:auto;display:block;}',
+'#cf-home .h-foot nav{display:flex;flex-wrap:wrap;gap:0 24px;}',
+'#cf-home .h-foot nav a{color:#A3A7AF;min-height:44px;display:flex;align-items:center;}',
+'#cf-home .h-foot nav a:hover{color:#FFFFFF;}',
+'@media (max-width:1023px){',
+'  #cf-home .h-hero{grid-template-columns:1fr;gap:32px;padding-top:36px;}',
+'  #cf-home .h-grid{grid-template-columns:repeat(2,minmax(0,1fr));}',
+'  #cf-home .h-facts{grid-template-columns:1fr;}',
+'}',
+/* <=768 the app shell draws its own header, tab bar and no footer */
+'@media (max-width:768px){',
+'  #cf-home .h-top,#cf-home .h-ann,#cf-home .h-foot{display:none;}',
+'  #cf-home .h-hero{padding-bottom:40px;}',
+'  #cf-home .h-lede{font-size:16px;}',
+'  #cf-home .h-pick label{flex:1 1 130px;}',
+'  #cf-home .h-pick select{min-width:0;width:100%;}',
+'  #cf-home .h-go{flex:1 1 100%;}',
+'  #cf-home .h-grid{gap:28px 12px;}',
+'  #cf-home .h-card h3{font-size:15px;}',
+'  #cf-home .h-buy{flex-direction:column;align-items:stretch;}',
+'  #cf-home .h-sec{padding-top:44px;}',
+'  #cf-home .h-facts{margin-top:48px;}',
+'}',
+'html.cf-native #cf-home .h-top,html.cf-native #cf-home .h-ann,html.cf-native #cf-home .h-foot{display:none;}',
+'@media (prefers-reduced-motion:reduce){ #cf-home .h-card:hover .h-plate img{transform:none;} }'
+  ].join('\n');
+
   function injectCSS() {
     if (D.getElementById('cf-web-css')) return;
     var s = D.createElement('style');
     s.id = 'cf-web-css';
-    s.textContent = CSS;
+    s.textContent = PLON ? CSS + '\n' + PL : CSS;
     (D.head || R).appendChild(s);
   }
 
@@ -997,13 +1150,181 @@
     }
   }
 
+  /* ------------------------------------------------------------------ */
+  /* 4. homepage - Pit Lane. Drawn from live store data: categories,     */
+  /* counts and prices all come from the WooCommerce Store API, never    */
+  /* from this file. The Elementor page underneath is hidden, not        */
+  /* deleted; ?cf_pl=off brings it back.                                 */
+  /* ------------------------------------------------------------------ */
+  var HOME_PICKS = [756, 441, 525, 425, 684, 615, 712, 807];
+  var AREAS = [
+    ['engine-covers', 'Engine and covers'],
+    ['seat-tail', 'Seat and tail'],
+    ['fairings-bodywork', 'Fairings and bodywork'],
+    ['guards-swingarm', 'Guards and swingarm'],
+    ['tank', 'Tank'],
+    ['fenders-huggers', 'Fenders and huggers'],
+    ['belly-sub-frame', 'Belly and sub-frame'],
+    ['winglets-aero', 'Winglets and aero'],
+    ['windshields', 'Windshields'],
+    ['mirrors', 'Mirrors']
+  ];
+  var GEN_URL = '/product-category/bmw/s1000rr/';
+  var HERO = {
+    src: '/wp-content/uploads/2026/11/cf-756-rpm-2-1.jpg',
+    alt: 'BMW S1000RR fitted with carbon fiber side fairings and bodywork',
+    href: '/product/bmw-s1000rr-carbon-fiber-side-fairings-cowls/',
+    label: 'Side fairings'
+  };
+
+  function yearUrl(y) {
+    y = +y;
+    if (y >= 2023) return GEN_URL + 's1000rr-2023-2024/';
+    if (y === 2019) return GEN_URL + 's1000rr-2019-2022/';
+    if (y >= 2020) return '/shop/?product_cat=s1000rr-2019-2022,s1000rr-2020-2022';
+    return '/shop/';
+  }
+
+  function storePrice(p) {
+    var pr = p.prices || {};
+    var unit = Math.pow(10, pr.currency_minor_unit || 2);
+    var range = pr.price_range;
+    if (range && range.min_amount && range.max_amount && range.min_amount !== range.max_amount) {
+      return { from: true, v: range.min_amount / unit };
+    }
+    return { from: false, v: (pr.price || 0) / unit };
+  }
+
+  function homeCard(p) {
+    var card = el('article', 'h-card');
+    var plate = el('a', 'h-plate');
+    plate.href = p.permalink;
+    plate.setAttribute('tabindex', '-1');
+    plate.setAttribute('aria-hidden', 'true');
+    var im = p.images && p.images[0];
+    if (im) {
+      var img = D.createElement('img');
+      img.src = im.thumbnail || im.src;
+      if (im.srcset) { img.srcset = im.srcset; img.sizes = '(max-width:560px) 50vw, 25vw'; }
+      img.alt = '';
+      img.loading = 'lazy';
+      img.width = 600; img.height = 600;
+      plate.appendChild(img);
+    }
+    card.appendChild(plate);
+
+    var h = el('h3');
+    var name = decodeEntities(p.name);
+    var a = el('a', null, shortText(name) || name);
+    a.href = p.permalink;
+    h.appendChild(a);
+    card.appendChild(h);
+
+    var fit = null;
+    (p.categories || []).forEach(function (c) { if (!fit && GEN[c.slug]) fit = GEN[c.slug]; });
+    if (fit) card.appendChild(el('p', 'h-fit', 'Fits ' + fit));
+
+    var buy = el('div', 'h-buy');
+    var price = storePrice(p);
+    var pe = el('span', 'h-price');
+    if (price.from) pe.appendChild(el('small', null, 'from'));
+    pe.appendChild(D.createTextNode(money(price.v)));
+    buy.appendChild(pe);
+    var cta = el('a', 'h-cta', p.type === 'simple' ? 'Add to cart' : 'Choose options');
+    cta.href = p.type === 'simple' && p.is_purchasable ? '/cart/?add-to-cart=' + p.id : p.permalink;
+    cta.setAttribute('aria-label', cta.textContent + ': ' + a.textContent);
+    buy.appendChild(cta);
+    card.appendChild(buy);
+    return card;
+  }
+
+  function decodeEntities(s) {
+    var t = D.createElement('textarea');
+    t.innerHTML = s || '';
+    return t.value;
+  }
+
+  function home() {
+    var page = $('[data-elementor-type="wp-page"]');
+    if (!page || $('#cf-home')) return;
+    R.classList.add('cf-home');
+
+    var logo = '/wp-content/uploads/2026/06/cf-logo.png';
+    var root = el('div');
+    root.id = 'cf-home';
+    root.innerHTML =
+      '<div class="h-ann">Free shipping over ' + money(FREESHIP) + ' <span>Final sale, so ask us about fitment first</span></div>' +
+      '<header class="h-top"><a href="/" aria-label="Carbon Freaks home"><img src="' + logo + '" alt="Carbon Freaks" width="160" height="30"></a>' +
+      '<nav aria-label="Main"><a href="/shop/">Shop all</a><a class="h-hide-s" href="/about/">About</a><a class="h-hide-s" href="/contact/">Fitment help</a><a href="/cart/">Cart</a></nav></header>' +
+      '<section class="h-hero"><div>' +
+        '<h1>Carbon for the S1000RR. Pick your year, see what fits.</h1>' +
+        '<p class="h-lede">Carbon fiber parts for the BMW S1000RR, each one listed under the model years it fits. Pick your bike and we show only those parts.</p>' +
+        '<form class="h-pick" action="/shop/">' +
+          '<label>Bike<select name="bike"><option>BMW S1000RR</option></select></label>' +
+          '<label>Year<select name="year"><option>2024</option><option>2023</option><option selected>2022</option><option>2021</option><option>2020</option><option>2019</option></select></label>' +
+          '<button class="h-go" type="submit">Show parts that fit</button>' +
+        '</form>' +
+        '<p class="h-hint">Not sure of your year? <a href="/contact/">Ask us</a> before you buy.</p>' +
+      '</div><figure class="h-shot"><img src="' + HERO.src + '" alt="' + HERO.alt + '" width="1000" height="1000" fetchpriority="high">' +
+        '<figcaption>Shown fitted: <a href="' + HERO.href + '">' + HERO.label + '</a> and bodywork</figcaption></figure></section>' +
+      '<section class="h-sec" aria-labelledby="h-areas-t"><h2 id="h-areas-t">Shop by area of the bike</h2><div class="h-areas"></div></section>' +
+      '<section class="h-sec" aria-labelledby="h-grid-t"><div class="h-gridhead"><h2 id="h-grid-t">Parts riders look at first</h2><a href="/shop/">See all parts</a></div><div class="h-grid" aria-busy="true"></div></section>' +
+      '<section class="h-facts" aria-label="How buying works">' +
+        '<p><b>Free shipping over ' + money(FREESHIP) + '.</b>Orders under that pay shipping at checkout. <a href="/shipping-policy/">Shipping policy</a></p>' +
+        '<p><b>Pay over time.</b>Klarna, Affirm and Afterpay are offered at checkout.</p>' +
+        '<p><b>Not sure it fits?</b>Every sale is final, so <a href="/contact/">ask us</a> before you buy. <a href="/refund-returns/">Final sale policy</a></p>' +
+      '</section>' +
+      '<footer class="h-foot"><img src="' + logo + '" alt="Carbon Freaks" width="128" height="24">' +
+        '<nav aria-label="Footer"><a href="/shipping-policy/">Shipping</a><a href="/refund-returns/">Final sale policy</a><a href="/track-order/">Track an order</a><a href="/contact/">Contact</a></nav></footer>';
+    page.parentNode.insertBefore(root, page);
+
+    var form = $('.h-pick', root);
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      location.href = yearUrl(form.year.value);
+    });
+
+    /* part areas, with live counts; an area with nothing in it is left out */
+    fetch('/wp-json/wc/store/v1/products/categories?per_page=100').then(function (r) { return r.json(); }).then(function (cats) {
+      var by = {};
+      (cats || []).forEach(function (c) { by[c.slug] = c; });
+      var box = $('.h-areas', root);
+      AREAS.forEach(function (a) {
+        var c = by[a[0]];
+        if (!c || !c.count) return;
+        var link = el('a', null, a[1] + ' ');
+        link.href = c.permalink || ('/product-category/' + a[0] + '/');
+        link.appendChild(el('span', null, String(c.count)));
+        box.appendChild(link);
+      });
+    }).catch(function () {});
+
+    var grid = $('.h-grid', root);
+    fetch('/wp-json/wc/store/v1/products?per_page=8&include=' + HOME_PICKS.join(',')).then(function (r) { return r.json(); }).then(function (list) {
+      var byId = {};
+      (list || []).forEach(function (p) { byId[p.id] = p; });
+      HOME_PICKS.forEach(function (id) { if (byId[id]) grid.appendChild(homeCard(byId[id])); });
+      grid.removeAttribute('aria-busy');
+      grid.style.minHeight = '';
+    }).catch(function () {
+      grid.removeAttribute('aria-busy');
+      var p = el('p', null, 'Parts did not load. ');
+      var a = el('a', null, 'Open the full parts list');
+      a.href = '/shop/';
+      p.appendChild(a);
+      grid.appendChild(p);
+    });
+  }
+
   function boot() {
     R.classList.add('cf-web');
+    if (PLON) R.classList.add('cf-pl');
     injectCSS();
     announce();
     countFix();
 
     var b = D.body.className || '';
+    if (PLON && /(^|\s)home(\s|$)/.test(b)) home();
     if (/single-product/.test(b)) pdp();
     else if (/(post-type-archive-product|tax-product_cat|woocommerce-shop)/.test(b)) shop();
 
