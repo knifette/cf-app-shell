@@ -592,6 +592,17 @@
 'html.cf-web.cf-pl body.woocommerce-checkout input[type="radio"],html.cf-web.cf-pl body.woocommerce-checkout input[type="checkbox"]{accent-color:var(--cfw-ink);}',
 'html.cf-web.cf-pl.cf-pdp form.cart .single_add_to_cart_button{background:var(--cfw-red)!important;border-radius:4px!important;}',
 'html.cf-web.cf-pl.cf-pdp form.cart .single_add_to_cart_button:hover{background:var(--cfw-red-lift)!important;}',
+'html.cf-web.cf-pl.cf-pdp form.cart button.single_add_to_cart_button.single_add_to_cart_button.disabled{background:var(--cfw-red)!important;color:#FFFFFF!important;opacity:1!important;cursor:pointer;}',
+'html.cf-web.cf-pl.cf-pdp form.cart .single_add_to_cart_button{min-height:56px!important;font-size:16px!important;letter-spacing:0!important;text-transform:none!important;font-weight:700!important;}',
+'html.cf-web.cf-pl.cf-pdp .woocommerce-product-gallery{position:sticky!important;top:24px;align-self:start;}',
+'html.cf-web.cf-pl .cf-fitchip{letter-spacing:.01em!important;text-transform:none!important;font-size:12px!important;font-weight:600!important;}',
+'html.cf-web.cf-pl .cf-from{text-transform:none!important;letter-spacing:0!important;font-size:13px!important;}',
+'html.cf-web.cf-pl .site-header .site-title,html.cf-web.cf-pl .site-header .ast-site-title-wrap{display:none!important;}',
+'html.cf-web.cf-pl .site-header .custom-logo{height:30px!important;width:auto!important;max-width:none!important;}',
+'html.cf-web.cf-pl .site-footer,html.cf-web.cf-pl .site-footer *{font-family:var(--cfw-body)!important;text-transform:none!important;letter-spacing:0!important;}',
+'html.cf-web.cf-pl .site-footer .ast-footer-copyright{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 32px;width:100%;font-size:14px;}',
+'html.cf-web.cf-pl .cf-footnav{display:flex;flex-wrap:wrap;gap:0 24px;}',
+'html.cf-web.cf-pl .cf-footnav a{min-height:44px;display:flex;align-items:center;}',
 
 '}',
 /* ================================================================== */
@@ -1336,6 +1347,31 @@
     });
   }
 
+  /* Pit Lane chrome on the theme's own header and footer (desktop web):
+     the wordmark logo the homepage uses, and the same footer links. */
+  function plChrome() {
+    var logo = $('.site-header .custom-logo');
+    if (logo && !logo.__cf) {
+      logo.__cf = 1;
+      logo.removeAttribute('srcset');
+      logo.removeAttribute('sizes');
+      logo.src = '/wp-content/uploads/2026/06/cf-logo.png';
+      logo.alt = 'Carbon Freaks';
+    }
+    var copy = $('.site-footer .ast-footer-copyright');
+    if (copy && !$('.cf-footnav', copy)) {
+      var nav = el('nav', 'cf-footnav');
+      nav.setAttribute('aria-label', 'Footer');
+      [['/shipping-policy/', 'Shipping'], ['/refund-returns/', 'Final sale policy'],
+       ['/track-order/', 'Track an order'], ['/contact/', 'Contact']].forEach(function (l) {
+        var a = el('a', null, l[1]);
+        a.href = l[0];
+        nav.appendChild(a);
+      });
+      copy.appendChild(nav);
+    }
+  }
+
   function boot() {
     R.classList.add('cf-web');
     if (PLON && !R.classList.contains('cf-native')) R.classList.add('cf-pl');
@@ -1345,6 +1381,7 @@
 
     var b = D.body.className || '';
     if (PLON && /(^|\s)home(\s|$)/.test(b)) home();
+    if (R.classList.contains('cf-pl') && !MOBILE()) plChrome();
     if (/single-product/.test(b)) pdp();
     else if (/(post-type-archive-product|tax-product_cat|woocommerce-shop)/.test(b)) shop();
 
