@@ -601,7 +601,10 @@
 'html.cf-web.cf-pl .site-header .custom-logo{height:30px!important;width:auto!important;max-width:none!important;}',
 'html.cf-web.cf-pl .site-footer,html.cf-web.cf-pl .site-footer *{font-family:var(--cfw-body)!important;text-transform:none!important;letter-spacing:0!important;}',
 'html.cf-web.cf-pl .site-footer .ast-footer-copyright{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 32px;width:100%;font-size:14px;}',
-'html.cf-web.cf-pl .cf-footnav{display:flex;flex-wrap:wrap;gap:0 24px;}',
+'html.cf-web.cf-pl .site-footer .ast-footer-copyright::after{content:none!important;display:none!important;}',
+'html.cf-web.cf-pl .site-footer .ast-footer-copyright > p{display:none!important;}',
+'html.cf-web.cf-pl .cf-foot{display:flex!important;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 32px;width:100%;font-size:14px!important;color:var(--cfw-night-mute);}',
+'html.cf-web.cf-pl .cf-footnav{display:flex;flex-wrap:wrap;gap:0 24px;font-size:14px!important;}',
 'html.cf-web.cf-pl .cf-footnav a{min-height:44px;display:flex;align-items:center;}',
 
 '}',
@@ -1359,7 +1362,9 @@
       logo.alt = 'Carbon Freaks';
     }
     var copy = $('.site-footer .ast-footer-copyright');
-    if (copy && !$('.cf-footnav', copy)) {
+    if (copy && !$('.cf-foot', copy)) {
+      var foot = el('div', 'cf-foot');
+      foot.appendChild(el('span', null, '© ' + new Date().getFullYear() + ' Carbon Freaks'));
       var nav = el('nav', 'cf-footnav');
       nav.setAttribute('aria-label', 'Footer');
       [['/shipping-policy/', 'Shipping'], ['/refund-returns/', 'Final sale policy'],
@@ -1368,7 +1373,8 @@
         a.href = l[0];
         nav.appendChild(a);
       });
-      copy.appendChild(nav);
+      foot.appendChild(nav);
+      copy.appendChild(foot);
     }
   }
 
