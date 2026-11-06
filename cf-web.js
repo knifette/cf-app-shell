@@ -526,6 +526,10 @@
 '  --cfw-disp:"Archivo",system-ui,sans-serif; --cfw-body:"Archivo",system-ui,-apple-system,sans-serif;',
 '}',
 'html.cf-web.cf-pl, html.cf-web.cf-pl body{background:var(--cfw-ground);color:var(--cfw-ink);font-family:var(--cfw-body);}',
+'html.cf-web.cf-pl body,html.cf-web.cf-pl #page,html.cf-web.cf-pl #content,html.cf-web.cf-pl .site-content,html.cf-web.cf-pl .ast-container,html.cf-web.cf-pl #primary,html.cf-web.cf-pl #secondary{background:var(--cfw-ground)!important;}',
+'html.cf-web.cf-pl ul.products li.product{background:transparent!important;}',
+'html.cf-web.cf-pl #content h1,html.cf-web.cf-pl #content h2,html.cf-web.cf-pl #content h3,html.cf-web.cf-pl ul.products li.product .woocommerce-loop-product__title,html.cf-web.cf-pl ul.products li.product .price,html.cf-web.cf-pl ul.products li.product .price .amount,html.cf-web.cf-pl .woocommerce-result-count,html.cf-web.cf-pl .woocommerce-breadcrumb,html.cf-web.cf-pl .woocommerce-breadcrumb a,html.cf-web.cf-pl #secondary a,html.cf-web.cf-pl #secondary .widget-title,html.cf-web.cf-pl .summary .price,html.cf-web.cf-pl .summary .price .amount{color:var(--cfw-ink)!important;}',
+'html.cf-web.cf-pl .cf-from,html.cf-web.cf-pl #secondary .price_label{color:var(--cfw-mute)!important;}',
 
 /* one display voice: Archivo, italic, stretched - pit-board lettering */
 'html.cf-web.cf-pl.cf-shop .cf-head h1,html.cf-web.cf-pl.cf-pdp h1.product_title,html.cf-web.cf-pl .related > h2,html.cf-web.cf-pl .up-sells > h2,html.cf-web.cf-pl body.woocommerce-cart h1,html.cf-web.cf-pl body.woocommerce-checkout h1{font-family:var(--cfw-disp)!important;font-style:italic;font-weight:800!important;font-stretch:118%;letter-spacing:-.02em;}',
