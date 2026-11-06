@@ -163,10 +163,9 @@
 /* PayPal's "As low as ... with PayPal" line on the product page renders
    black text inside its own shadow root, so on the dark skin it measured
    1.06:1 (gate nightly 11-06, axe color-contrast). The text can't be
-   restyled from outside; a light pill behind the host makes it 21:1 and
-   its blue link 4.7:1. The desktop Pit Lane ground is light already. */
-'html.cf-web:not(.cf-pl) paypal-message{display:block!important;background:#F4F4F5!important;border-radius:6px!important;padding:8px 12px!important;margin:8px 0!important;}',
-'@media (max-width:768px){html.cf-web paypal-message{display:block!important;background:#F4F4F5!important;border-radius:6px!important;padding:8px 12px!important;margin:8px 0!important;}}',
+   restyled from outside; a white pill behind the host makes it 21:1 and
+   its blue link 5.2:1 (on the Pit Lane grey ground the link was 4.45). */
+'html.cf-web paypal-message{display:block!important;background:#FFFFFF!important;border-radius:6px!important;padding:8px 12px!important;margin:8px 0!important;}',
 
 /* The payment radios and the privacy checkbox are the browser's own
    13px controls, so they paint bright white on a black page and read as
