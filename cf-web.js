@@ -572,6 +572,7 @@
 'html.cf-web.cf-pl.cf-shop ul.products li.product a.button:hover,html.cf-web.cf-pl .related ul.products li.product a.button:hover{background:var(--cfw-red-lift)!important;}',
 'html.cf-web.cf-pl .cf-fitchip{background:#F1F2F4!important;color:var(--cfw-ink)!important;border:0!important;backdrop-filter:none!important;}',
 'html.cf-web.cf-pl .cf-fitchip.cf-fitchip-on{background:var(--cfw-ink)!important;color:#FFFFFF!important;}',
+'html.cf-web.cf-pl .woocommerce-pagination .page-numbers a,html.cf-web.cf-pl .woocommerce-pagination a.page-numbers{background:#FFFFFF!important;color:var(--cfw-ink)!important;border:1px solid var(--cfw-line)!important;}',
 'html.cf-web.cf-pl .woocommerce-pagination .current{background:var(--cfw-ink)!important;border-color:var(--cfw-ink)!important;color:#FFFFFF!important;}',
 
 /* filter rail: ink marks the active filter, not red */
