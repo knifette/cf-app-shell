@@ -607,6 +607,12 @@
 'html.cf-web.cf-pl .cf-foot{display:flex!important;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 32px;width:100%;font-size:14px!important;color:var(--cfw-night-mute);}',
 'html.cf-web.cf-pl .cf-footnav{display:flex;flex-wrap:wrap;gap:0 24px;font-size:14px!important;}',
 'html.cf-web.cf-pl .cf-footnav a{min-height:44px;display:flex;align-items:center;}',
+'html.cf-web.cf-pl .woocommerce-products-header__title,html.cf-web.cf-pl h1.page-title{font-family:var(--cfw-disp)!important;font-style:italic;font-weight:800!important;font-stretch:118%;letter-spacing:-.02em;}',
+'html.cf-web.cf-pl.cf-pdp table.variations label{font-family:var(--cfw-body)!important;font-size:14px!important;letter-spacing:0!important;text-transform:none!important;color:var(--cfw-ink)!important;font-weight:600!important;}',
+'html.cf-web.cf-pl .woocommerce-breadcrumb{font-size:14px!important;line-height:1.5!important;}',
+'html.cf-web.cf-pl.cf-pdp .flex-control-thumbs{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:8px!important;}',
+'html.cf-web.cf-pl.cf-pdp .flex-control-thumbs li{width:auto!important;margin:0!important;float:none!important;}',
+'html.cf-web.cf-pl .site-header .cf-hnav > .menu-link{color:var(--cfw-night-ink)!important;}',
 
 '}',
 /* ================================================================== */
@@ -1361,6 +1367,16 @@
       logo.removeAttribute('sizes');
       logo.src = '/wp-content/uploads/2026/06/cf-logo.png';
       logo.alt = 'Carbon Freaks';
+    }
+    var menu = $('.site-header .main-header-menu');
+    if (menu && !$('.cf-hnav', menu)) {
+      [['/shop/', 'Shop all'], ['/contact/', 'Fitment help'], ['/cart/', 'Cart']].forEach(function (l) {
+        var li = el('li', 'menu-item cf-hnav');
+        var a = el('a', 'menu-link', l[1]);
+        a.href = l[0];
+        li.appendChild(a);
+        menu.appendChild(li);
+      });
     }
     var copy = $('.site-footer .ast-footer-copyright');
     if (copy && !$('.cf-foot', copy)) {
