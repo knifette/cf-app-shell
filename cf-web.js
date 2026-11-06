@@ -607,6 +607,11 @@
 'html.cf-web.cf-pl .cf-foot{display:flex!important;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 32px;width:100%;font-size:14px!important;color:var(--cfw-night-mute);}',
 'html.cf-web.cf-pl .cf-footnav{display:flex;flex-wrap:wrap;gap:0 24px;font-size:14px!important;}',
 'html.cf-web.cf-pl .cf-footnav a{min-height:44px;display:flex;align-items:center;}',
+'html.cf-web.cf-pl .cf-ann,html.cf-web.cf-pl .cf-ann *{text-transform:none!important;letter-spacing:0!important;font-family:var(--cfw-body)!important;font-size:14px!important;}',
+'html.cf-web.cf-pl #secondary .widget-title,html.cf-web.cf-pl #secondary h2,html.cf-web.cf-pl #secondary h3,html.cf-web.cf-pl #secondary .cf-acc-h,html.cf-web.cf-pl #secondary summary{text-transform:none!important;letter-spacing:0!important;font-family:var(--cfw-body)!important;font-size:15px!important;font-weight:700!important;color:var(--cfw-ink)!important;}',
+'html.cf-web.cf-pl .single-product-category,html.cf-web.cf-pl .single-product-category a,html.cf-web.cf-pl [class*=cf-trust],html.cf-web.cf-pl [class*=cf-trust] *{text-transform:none!important;letter-spacing:0!important;}',
+'html.cf-web.cf-pl [class*=cf-trust]{font-size:13px!important;}',
+'html.cf-web.cf-pl.cf-pdp div.product,html.cf-web.cf-pl.cf-pdp #primary,html.cf-web.cf-pl.cf-pdp .site-main{overflow:visible!important;}',
 'html.cf-web.cf-pl .woocommerce-products-header__title,html.cf-web.cf-pl h1.page-title{font-family:var(--cfw-disp)!important;font-style:italic;font-weight:800!important;font-stretch:118%;letter-spacing:-.02em;}',
 'html.cf-web.cf-pl.cf-pdp table.variations label{font-family:var(--cfw-body)!important;font-size:14px!important;letter-spacing:0!important;text-transform:none!important;color:var(--cfw-ink)!important;font-weight:600!important;}',
 'html.cf-web.cf-pl .woocommerce-breadcrumb{font-size:14px!important;line-height:1.5!important;}',
@@ -1271,7 +1276,7 @@
     if (price.from) pe.appendChild(el('small', null, 'from'));
     pe.appendChild(D.createTextNode(money(price.v)));
     buy.appendChild(pe);
-    var cta = el('a', 'h-cta', p.type === 'simple' ? 'Add to cart' : 'Choose options');
+    var cta = el('a', 'h-cta', p.type === 'simple' ? 'Add to cart' : 'Select options');
     cta.href = p.type === 'simple' && p.is_purchasable ? '/cart/?add-to-cart=' + p.id : p.permalink;
     cta.setAttribute('aria-label', cta.textContent + ': ' + a.textContent);
     buy.appendChild(cta);
