@@ -738,11 +738,8 @@
   /* generation taxonomy -> the label a rider actually uses */
   var GEN = {
     's1000rr-2019-2022': 'S1000RR 2019-2022',
-    's1000rr-2020-2022': 'S1000RR 2020-2022',
     's1000rr-2023-2024': 'S1000RR 2023-2024',
-    'm1000rr': 'M1000RR',
-    's1000r': 'S1000R',
-    's1000xr': 'S1000XR'
+    's1000rr-2025': 'S1000RR 2025+'
   };
 
   function genOf(node) {
@@ -1224,17 +1221,17 @@
   ];
   var GEN_URL = '/product-category/bmw/s1000rr/';
   var HERO = {
-    src: '/wp-content/uploads/2026/11/cf-756-rpm-2-1.jpg',
-    alt: 'BMW S1000RR fitted with carbon fiber side fairings and bodywork',
-    href: '/product/bmw-s1000rr-carbon-fiber-side-fairings-cowls/',
-    label: 'Side fairings'
+    src: '/wp-content/uploads/2026/11/cf-964-vendor.jpg',
+    alt: 'Carbon fiber large side panels for the BMW S1000RR 2019-2022',
+    href: '/product/bmw-s1000rr-carbon-fiber-large-side-panels/',
+    label: 'Large side panels'
   };
 
   function yearUrl(y) {
     y = +y;
+    if (y >= 2025) return GEN_URL + 's1000rr-2025/';
     if (y >= 2023) return GEN_URL + 's1000rr-2023-2024/';
-    if (y === 2019) return GEN_URL + 's1000rr-2019-2022/';
-    if (y >= 2020) return '/shop/?product_cat=s1000rr-2019-2022,s1000rr-2020-2022';
+    if (y >= 2019) return GEN_URL + 's1000rr-2019-2022/';
     return '/shop/';
   }
 
@@ -1314,12 +1311,12 @@
         '<p class="h-lede">Carbon fiber parts for the BMW S1000RR, each one listed under the model years it fits. Pick your bike and we show only those parts.</p>' +
         '<form class="h-pick" action="/shop/">' +
           '<label>Bike<select name="bike"><option>BMW S1000RR</option></select></label>' +
-          '<label>Year<select name="year"><option>2024</option><option>2023</option><option selected>2022</option><option>2021</option><option>2020</option><option>2019</option></select></label>' +
+          '<label>Year<select name="year"><option>2026</option><option>2025</option><option>2024</option><option>2023</option><option selected>2022</option><option>2021</option><option>2020</option><option>2019</option></select></label>' +
           '<button class="h-go" type="submit">Show parts that fit</button>' +
         '</form>' +
         '<p class="h-hint">Not sure of your year? <a href="/contact/">Ask us</a> before you buy.</p>' +
       '</div><figure class="h-shot"><img src="' + HERO.src + '" alt="' + HERO.alt + '" width="1000" height="1000" fetchpriority="high">' +
-        '<figcaption>Shown fitted: <a href="' + HERO.href + '">' + HERO.label + '</a> and bodywork</figcaption></figure></section>' +
+        '<figcaption><a href="' + HERO.href + '">' + HERO.label + '</a>, S1000RR 2019-2022</figcaption></figure></section>' +
       '<section class="h-sec" aria-labelledby="h-areas-t"><h2 id="h-areas-t">Shop by area of the bike</h2><div class="h-areas"></div></section>' +
       '<section class="h-sec" aria-labelledby="h-grid-t"><div class="h-gridhead"><h2 id="h-grid-t">Parts riders look at first</h2><a href="/shop/">See all parts</a></div><div class="h-grid" aria-busy="true"></div></section>' +
       '<section class="h-facts" aria-label="How buying works">' +
