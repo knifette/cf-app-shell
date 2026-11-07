@@ -244,6 +244,8 @@
 '  html.cf-web.cf-shop #secondary .cf-gen a:last-child,html.cf-web.cf-shop #secondary .cf-parttype li:last-child a{border-bottom:0;}',
 '  html.cf-web.cf-shop #secondary .cf-gen a.cf-on{color:#FFFFFF;font-weight:600;border-left-color:var(--cfw-red);background:transparent;}',
 '  html.cf-web.cf-shop #secondary .cf-gen b{font-weight:inherit;}',
+'  html.cf-web.cf-shop #secondary .cf-gen a{justify-content:flex-start;}',
+'  html.cf-web.cf-shop #secondary .cf-gen img{flex:0 0 auto;width:72px;height:41px;object-fit:contain;background:#FFFFFF;border-radius:3px;}',
 '  html.cf-web.cf-shop #secondary .cf-parttype li{border-bottom:0;}',
 
 /* search: an outline button, not a red slab. Red in this rail is
@@ -741,6 +743,13 @@
     's1000rr-2023-2024': 'S1000RR 2023-2024',
     's1000rr-2025': 'S1000RR 2025+'
   };
+  /* bike photo per generation (Moto Composites' category art; no 2025 shot
+     exists there, so 2025+ reuses the 2023 bike) */
+  var BIKE = {
+    's1000rr-2019-2022': '/wp-content/uploads/2026/11/cf-bike-s1000rr-2019.webp',
+    's1000rr-2023-2024': '/wp-content/uploads/2026/11/cf-bike-s1000rr-2023.webp',
+    's1000rr-2025': '/wp-content/uploads/2026/11/cf-bike-s1000rr-2023.webp'
+  };
 
   function genOf(node) {
     var hit = null;
@@ -843,6 +852,11 @@
         var a = el('a');
         a.href = '/product-category/' + slug + '/';
         if (here.indexOf('/' + slug + '/') > -1) a.className = 'cf-on';
+        if (BIKE[slug]) {
+          var im = el('img');
+          im.src = BIKE[slug]; im.alt = ''; im.loading = 'lazy'; im.width = 72; im.height = 41;
+          a.appendChild(im);
+        }
         a.appendChild(el('b', null, GEN[slug]));
         list.appendChild(a);
       });
