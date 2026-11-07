@@ -655,7 +655,7 @@
 '#cf-home .h-hint{margin:14px 0 0;font-size:14px;color:#A3A7AF;}',
 '#cf-home .h-hint a,#cf-home .h-shot figcaption a{color:#E9EAED;}',
 '#cf-home .h-shot{margin:0;}',
-'#cf-home .h-shot img{display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:4px;}',
+'#cf-home .h-shot img{display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;background:#FFFFFF;padding:6%;box-sizing:border-box;border-radius:4px;}',
 '#cf-home .h-shot figcaption{margin-top:10px;font-size:14px;color:#A3A7AF;}',
 '#cf-home .h-sec{padding:64px var(--g) 0;}',
 '#cf-home h2{margin:0 0 20px;font-size:clamp(26px,3vw,36px);line-height:1.05;font-weight:800;font-style:italic;font-stretch:112%;letter-spacing:-.01em;color:#141518!important;text-transform:none;}',
