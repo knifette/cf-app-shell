@@ -2138,6 +2138,6 @@
    Disable by removing these lines, or per-visit with ?cf_web=off. ---- */
 (function(){ if(document.getElementById('cf-web-js')) return;
   var s=document.createElement('script'); s.id='cf-web-js'; s.async=false;
-  s.src='https://cdn.jsdelivr.net/gh/knifette/cf-app-shell@v1.2.2/cf-web.js';
+  s.src='https://cdn.jsdelivr.net/gh/knifette/cf-app-shell@v1.2.3/cf-web.js';
   (document.head||document.documentElement).appendChild(s);
 })();
