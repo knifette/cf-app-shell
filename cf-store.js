@@ -406,7 +406,7 @@
         '<p>Carbon fiber parts for the BMW S1000RR, shipped anywhere in the United States.</p></div>' +
         '<nav aria-label="Shop"><p>Shop</p><a href="/shop/">All parts</a>' +
           GENS.map(function (g) { return '<a href="' + GEN_URL + g.slug + '/">' + g.label + '</a>'; }).join('') + '</nav>' +
-        '<nav aria-label="Help"><p>Help</p><a href="/contact/">Fitment help</a><a href="/shipping-policy/">Shipping</a><a href="/refund-returns/">Final sale policy</a><a href="/track-order/">Track an order</a><a href="/about/">About</a></nav>' +
+        '<nav aria-label="Help"><p>Help</p><a href="/contact/">Fitment help</a><a href="/shipping-policy/">Shipping</a><a href="/refund-returns/">Final sale policy</a><a href="/track-order/">Track an order</a><a href="/about/">About</a><a href="/wholesale/">Wholesale</a></nav>' +
         '<div class="pay"><p>Pay with</p><span>Visa, Mastercard, Amex, Discover, Google Pay, PayPal, Venmo, Klarna, Affirm, Afterpay</span></div>' +
       '</div>' +
       '<p class="copy">© ' + new Date().getFullYear() + ' Carbon Freaks</p>';
