@@ -722,6 +722,27 @@
     }).catch(function () {});
   }
 
+  /* v2.8: thank-you page - more parts for the bike they just bought for (a new order, nothing is added to the paid one) */
+  function thankYou() {
+    var table = $('.woocommerce-table--order-details') || $('.woocommerce-order-details');
+    if (!table || $('.cfv2-more')) return;
+    var norm = function (u) { return String(u || '').split('?')[0].split('#')[0].replace(/\/?$/, '/'); };
+    var urls = $$('.product-name a', table).map(function (a) { return norm(a.href); });
+    if (!urls.length) return;
+    products().then(function (all) {
+      var ids = [], slugs = [];
+      all.forEach(function (p) { if (urls.indexOf(norm(p.permalink)) > -1) { ids.push(p.id); slugs = slugs.concat(slugsOf(p)); } });
+      if (!ids.length) return;
+      var list = suggest(all, slugs, ids, 4);
+      if (!list.length) return;
+      var sec = h('section', 'cfv2-more');
+      sec.innerHTML = '<h2>Finish the build</h2><p>More parts that fit the same bike. These go in a new order.</p><div class="grid"></div>';
+      list.forEach(function (p) { $('.grid', sec).appendChild(card(p)); });
+      var box = table.closest('section') || table;
+      box.parentNode.insertBefore(sec, box.nextSibling);
+    }).catch(function () {});
+  }
+
   /* ------------------------------------------------------------------ */
   /* phone tab bar: Shop, Your bike, Search, Cart                        */
   /* ------------------------------------------------------------------ */
@@ -1563,7 +1584,8 @@ html.cfv2 .woocommerce-checkout .form-row[hidden]{display:none!important;}
     else if (/single-product/.test(b)) pdp();
     else if (/(post-type-archive-product|tax-product_cat|woocommerce-shop)/.test(b)) shop();
     else if (/woocommerce-cart/.test(b)) cart();
-    if (/woocommerce-checkout/.test(b)) slimCheckout();
+    if (/woocommerce-order-received/.test(b)) thankYou();
+    else if (/woocommerce-checkout/.test(b)) slimCheckout();
     if (/woocommerce-(cart|checkout)/.test(b)) {
       shortNames();
       var ot = $('#order_review') || $('.entry-content > .woocommerce');
