@@ -14,7 +14,7 @@
   window.__cfStore = 1;
 
   var D = document, R = D.documentElement;
-  var FREESHIP = 600; // live WooCommerce free-shipping rule
+  var FREESHIP = 1500; // live WooCommerce free-shipping rule (raised from 600 on 2026-11-08)
   var LOGO = '/wp-content/uploads/2026/06/cf-logo.png';
   var GENS = [
     { slug: 's1000rr-2019-2022', label: 'S1000RR 2019–2022', from: 2019, to: 2022, hero: 964 },
@@ -119,6 +119,10 @@
     check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>',
     chat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>',
     lock: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+    search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>',
+    bike: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="16" r="3.5"/><circle cx="18.5" cy="16" r="3.5"/><path d="M5.5 16 10 9h5l3.5 7M10 9 8 6H6M15 9l1-3h2"/></svg>',
+    grid: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg>',
+    share: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 13v6h14v-6"/></svg>',
     down: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
   };
 
@@ -166,7 +170,12 @@
   function setCart(c) {
     cartState = c;
     var n = c ? c.items_count : 0;
-    $$('.cfv2-count').forEach(function (e) { e.textContent = n; e.hidden = !n; });
+    $$('.cfv2-count').forEach(function (e) {
+      var was = +e.textContent || 0;
+      e.textContent = n; e.hidden = !n;
+      if (n > was && was >= 0 && e.__seen) { e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop'); }
+      e.__seen = 1;
+    });
     $$('.cfv2-ctotal').forEach(function (e) { e.textContent = n ? money(cartTotal(c)) : 'Cart'; });
   }
   function addToCart(id, qty) {
@@ -202,6 +211,7 @@
       '<a class="plate" href="' + esc(p.permalink) + '" tabindex="-1" aria-hidden="true"><img src="' + esc(imgOf(p)) + '" alt="" loading="lazy" width="600" height="600"></a>' +
       '<div class="meta"><h3><a href="' + esc(p.permalink) + '">' + esc(short(p.name)) + '</a></h3>' +
       (fit ? '<p class="fit' + (mine ? ' is-mine' : '') + '">' + (mine ? ICON.check + 'Fits your bike' : esc(fit)) + '</p>' : '') +
+      (payIn4(priceOf(p)) ? '<p class="p4">or 4 × ' + money(Math.ceil(priceOf(p) / 4 * 100) / 100) + '</p>' : '') +
       '<div class="buy"><span class="price">' + money(priceOf(p)) + '</span>' +
       (buy ? '<button type="button" class="cfv2-add" data-id="' + p.id + '">Add to cart</button>'
            : '<a class="cfv2-add" href="' + esc(p.permalink) + '">View</a>') +
@@ -350,7 +360,7 @@
   /* header + footer (every page)                                        */
   /* ------------------------------------------------------------------ */
   function chrome() {
-    var bar = h('div', 'cfv2-ann', 'Free shipping on US orders over ' + money(FREESHIP) + '<span> Pay over time with Klarna, Affirm or Afterpay</span>');
+    var bar = h('div', 'cfv2-ann', 'Free shipping on US orders over ' + money(FREESHIP).replace('.00', '') + '<span> Pay over time with Klarna, Affirm or Afterpay</span>');
     var head = h('header', 'cfv2-head');
     head.innerHTML =
       '<div class="w">' +
@@ -360,6 +370,7 @@
           GENS.map(function (g) { return '<a href="' + GEN_URL + g.slug + '/">' + g.label.replace('S1000RR ', '') + '</a>'; }).join('') +
           '<a href="/contact/">Fitment help</a>' +
         '</nav>' +
+        '<button type="button" class="srch" data-search aria-label="Search parts">' + ICON.search + '</button>' +
         '<a class="cart" href="/cart/" aria-label="Cart">' + ICON.cart + '<span class="cfv2-count" hidden>0</span><span class="cfv2-ctotal">Cart</span></a>' +
         '<button type="button" class="burger" aria-label="Menu" aria-expanded="false" aria-controls="cfv2-menu">' + ICON.menu + '</button>' +
       '</div>' +
@@ -374,6 +385,7 @@
     D.body.insertBefore(bar, head);
 
     bikeBar(head);
+    tabBar();
 
     var burger = $('.burger', head), menu = $('.menu', head);
     burger.addEventListener('click', function () {
@@ -462,9 +474,9 @@
       '</div></section>' +
       '<section class="sec"><div class="w"><div class="sh"><h2>Featured parts</h2><a href="/shop/">See all 53 parts</a></div><div class="grid" aria-busy="true"></div></div></section>' +
       '<section class="sec kits" hidden><div class="w"><div class="sh"><h2>Buy it as a set</h2></div><p class="kl">Parts for the same area of your bike, added to your cart in one tap. The set price is the parts added up.</p><div class="cfv2-kits"></div></div></section>' +
-      '<section class="sec"><div class="w"><div class="sh"><h2>Shop by part</h2></div><div class="areas" aria-busy="true"></div></div></section>' +
+      '<section class="sec"><div class="w"><div class="sh"><h2>Shop by part</h2></div><div class="cfv2-finder" hidden></div><div class="areas" aria-busy="true"></div></div></section>' +
       '<section class="facts"><div class="w">' +
-        '<p>' + ICON.truck + '<span><b>Free US shipping over ' + money(FREESHIP) + '</b>We ship to all 50 states. Smaller orders pay shipping at checkout.</span></p>' +
+        '<p>' + ICON.truck + '<span><b>Free US shipping over ' + money(FREESHIP).replace('.00', '') + '</b>We ship to all 50 states. Smaller orders pay shipping at checkout.</span></p>' +
         '<p>' + ICON.split + '<span><b>Pay over time</b>Klarna, Affirm and Afterpay at checkout.</span></p>' +
         '<p>' + ICON.chat + '<span><b>Fit confirmed first</b>Sales are final. <a href="/contact/">Send us your year</a> and we check it.</span></p>' +
         '<p>' + ICON.lock + '<span><b>Secure checkout</b>Cards, Google Pay and PayPal.</span></p>' +
@@ -525,6 +537,7 @@
         box.appendChild(a);
       });
       box.removeAttribute('aria-busy');
+      finder($('.cfv2-finder', root), all);
     }).catch(function () {
       $('.grid', root).innerHTML = '<p>Parts did not load. <a href="/shop/">Open the full parts list</a>.</p>';
     });
@@ -615,7 +628,7 @@
       if (btn) btn.textContent = 'Add to cart';
       var pts = h('ul', 'cfv2-points');
       pts.innerHTML =
-        '<li>' + ICON.truck + 'Free US shipping over ' + money(FREESHIP) + '</li>' +
+        '<li>' + ICON.truck + 'Free US shipping over ' + money(FREESHIP).replace('.00', '') + '</li>' +
         '<li>' + ICON.split + 'Pay over time with Klarna, Affirm or Afterpay</li>' +
         '<li>' + ICON.lock + 'Secure checkout</li>';
       form.parentNode.insertBefore(pts, form.nextSibling);
@@ -640,7 +653,9 @@
           if (form.requestSubmit) form.requestSubmit(btn); else btn.click();
         });
         new IntersectionObserver(function (en) {
-          sticky.classList.toggle('on', !en[0].isIntersecting && en[0].boundingClientRect.top < 0);
+          var on = !en[0].isIntersecting && en[0].boundingClientRect.top < 0;
+          sticky.classList.toggle('on', on);
+          R.classList.toggle('cfv2-stickyon', on);
         }).observe(btn);
       }
     }
@@ -683,8 +698,10 @@
     R.classList.add('cfv2-cart');
     var host = $('.entry-content > .woocommerce') || $('.woocommerce');
     if (!host) return;
+    sharedBuild(host);
     loadCart().then(function (c) {
       if (!c.items_count) return;
+      shareButton(host, c);
       var head = $('.cart-collaterals', host);
       if (head && !$('.cfv2-ship', host)) {
         var s = h('div', 'cfv2-ship');
@@ -703,6 +720,214 @@
         host.appendChild(sec);
       });
     }).catch(function () {});
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* phone tab bar: Shop, Your bike, Search, Cart                        */
+  /* ------------------------------------------------------------------ */
+  function tabBar() {
+    if (/woocommerce-(cart|checkout)/.test(D.body.className) || $('.cfv2-tabs')) return;
+    var b = myBike(), here = location.pathname;
+    var nav = h('nav', 'cfv2-tabs');
+    nav.setAttribute('aria-label', 'Quick links');
+    nav.innerHTML =
+      '<a href="/shop/"' + (here === '/shop/' ? ' aria-current="page"' : '') + '>' + ICON.grid + '<span>Shop</span></a>' +
+      '<button type="button" data-bikes>' + ICON.bike + '<span>' + (b ? esc(b.label.replace('S1000RR ', '')) : 'My bike') + '</span></button>' +
+      '<button type="button" data-search>' + ICON.search + '<span>Search</span></button>' +
+      '<a href="/cart/">' + ICON.cart + '<span>Cart</span><span class="cfv2-count" hidden>0</span></a>';
+    D.body.appendChild(nav);
+    R.classList.add('cfv2-hastabs');
+    $('[data-bikes]', nav).addEventListener('click', function () {
+      var sheet = h('div', 'cfv2-search cfv2-bikes');
+      sheet.innerHTML = '<div class="scrim" data-close></div><div class="sbox" role="dialog" aria-modal="true" aria-label="Pick your bike">' +
+        '<div class="shead"><p class="st">Which S1000RR do you ride?</p><button type="button" class="x" data-close aria-label="Close">' + ICON.close + '</button></div>' +
+        '<div class="opts">' + GENS.map(function (g) {
+          return '<a href="' + GEN_URL + g.slug + '/" data-bike="' + g.slug + '"' + (b && b.slug === g.slug ? ' aria-current="true"' : '') + '>' + g.label + (b && b.slug === g.slug ? '<i>Your bike</i>' : '') + '</a>';
+        }).join('') + '</div>' +
+        '<p class="sn">We remember it on this phone and show what fits.</p></div>';
+      openSheet(sheet);
+      sheet.addEventListener('click', function (e) {
+        var a = e.target.closest('[data-bike]');
+        if (a) setBike(a.getAttribute('data-bike'));
+      });
+    });
+  }
+
+  function openSheet(el, focusSel) {
+    var back = D.activeElement;
+    D.body.appendChild(el);
+    R.classList.add('cfv2-lock');
+    requestAnimationFrame(function () { el.classList.add('open'); var f = $(focusSel || '.sbox', el); if (f) f.focus(); });
+    function close() {
+      el.classList.remove('open');
+      R.classList.remove('cfv2-lock');
+      D.removeEventListener('keydown', key);
+      setTimeout(function () { el.remove(); }, 200);
+      if (back && back.focus) back.focus();
+    }
+    function key(e) { if (e.key === 'Escape') close(); }
+    D.addEventListener('keydown', key);
+    el.addEventListener('click', function (e) { if (e.target.closest('[data-close]')) close(); });
+    $('.sbox', el).setAttribute('tabindex', '-1');
+    return close;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* instant search over the whole catalogue (53 parts, in the browser)  */
+  /* ------------------------------------------------------------------ */
+  D.addEventListener('click', function (e) {
+    if (!e.target.closest('[data-search]')) return;
+    e.preventDefault();
+    var el = h('div', 'cfv2-search');
+    el.innerHTML = '<div class="scrim" data-close></div><div class="sbox" role="dialog" aria-modal="true" aria-label="Search parts">' +
+      '<div class="shead"><label class="sf">' + ICON.search + '<input type="search" placeholder="Search parts, like tank or fairing" aria-label="Search parts" autocomplete="off" enterkeyhint="search"></label>' +
+      '<button type="button" class="x" data-close aria-label="Close">' + ICON.close + '</button></div>' +
+      '<div class="sres" aria-live="polite"></div></div>';
+    openSheet(el, 'input');
+    var inp = $('input', el), res = $('.sres', el), all = [];
+    function areaName(p) {
+      var s = slugsOf(p);
+      var a = AREAS.filter(function (x) { return s.indexOf(x[0]) > -1; })[0];
+      return a ? a[1] : '';
+    }
+    function draw() {
+      var q = inp.value.toLowerCase().trim(), bike = myBike();
+      var words = q.split(/\s+/).filter(Boolean);
+      var list = all.filter(function (p) {
+        var hay = (short(p.name) + ' ' + areaName(p) + ' ' + fitLabel(gensOf(slugsOf(p)))).toLowerCase();
+        return words.every(function (w) { return hay.indexOf(w) > -1; });
+      });
+      if (bike) list.sort(function (a, b2) { return (slugsOf(b2).indexOf(bike.slug) > -1) - (slugsOf(a).indexOf(bike.slug) > -1); });
+      if (!q) list = list.slice(0, 6);
+      res.innerHTML = (!q ? '<p class="sh">' + (bike ? 'Popular for your ' + esc(bike.label) : 'Popular parts') + '</p>' : '') +
+        (list.length ? list.slice(0, 20).map(function (p) {
+          var mine = fitsMine(slugsOf(p));
+          return '<a class="sr" href="' + esc(p.permalink) + '"><img src="' + esc(imgOf(p)) + '" alt="" width="56" height="56" loading="lazy">' +
+            '<span><b>' + esc(short(p.name)) + '</b><i' + (mine ? ' class="is-mine"' : '') + '>' + (mine ? 'Fits your bike' : esc(fitLabel(gensOf(slugsOf(p))))) + '</i></span>' +
+            '<em>' + money(priceOf(p)) + '</em></a>';
+        }).join('') : '<p class="none">No parts match “' + esc(inp.value) + '”. Try a shorter word, or <a href="/contact/">ask us</a> if you need something we don’t list.</p>');
+    }
+    products().then(function (d) {
+      all = d.filter(function (p) { return p.is_purchasable; });
+      if (!inp.value) {
+        var byId = {};
+        all.forEach(function (p) { byId[p.id] = p; });
+        var feat = FEATURED.map(function (id) { return byId[id]; }).filter(Boolean);
+        all = feat.concat(all.filter(function (p) { return FEATURED.indexOf(p.id) < 0; }));
+      }
+      draw();
+    });
+    inp.addEventListener('input', draw);
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { var f = $('.sr', res); if (f) location.href = f.href; }
+    });
+  });
+
+  /* ------------------------------------------------------------------ */
+  /* tap-the-bike part finder (home)                                     */
+  /* ------------------------------------------------------------------ */
+  /* a plain line drawing of a sport bike, front to the right; each zone is one part area */
+  var ZONES = [
+    ['seat-tail', 'M58 112 C110 118 200 124 262 130 L268 152 C220 160 170 166 122 160 C96 142 76 126 58 112 Z'],
+    ['tank', 'M262 130 C285 96 330 88 368 98 L372 150 C330 156 300 158 268 152 Z'],
+    ['fairings-bodywork', 'M372 98 C405 92 440 92 470 108 C492 122 506 140 512 158 C488 186 466 206 440 222 C410 228 380 230 356 228 C352 200 360 168 372 150 Z'],
+    ['windshields', 'M440 92 C460 70 482 60 502 62 C500 80 490 98 470 108 C460 100 450 95 440 92 Z'],
+    ['mirrors', 'M432 86 L452 78 L458 88 L438 95 Z'],
+    ['winglets-aero', 'M420 164 C440 158 460 152 482 148 L476 168 C456 172 438 176 422 178 Z'],
+    ['fenders-huggers', 'M428 196 C452 176 504 176 532 196 L524 206 C500 190 456 190 436 206 Z M76 192 C100 176 156 176 180 192 L172 202 C150 188 106 188 84 202 Z'],
+    ['engine-covers', 'M270 176 C300 172 330 172 352 176 L350 230 C324 236 298 238 276 234 Z'],
+    ['belly-sub-frame', 'M280 242 C316 247 356 245 394 236 C412 232 428 227 440 222 C430 248 410 262 380 268 C340 273 302 269 286 262 Z'],
+    ['guards-swingarm', 'M130 236 L272 204 L278 222 L138 252 Z']
+  ];
+  function finder(box, all) {
+    if (!box) return;
+    var count = {};
+    AREAS.forEach(function (a) { count[a[0]] = all.filter(function (p) { return slugsOf(p).indexOf(a[0]) > -1; }).length; });
+    var name = {};
+    AREAS.forEach(function (a) { name[a[0]] = a[1]; });
+    var zones = ZONES.filter(function (z) { return count[z[0]]; });
+    if (zones.length < 4) return;
+    box.innerHTML = '<div class="fi"><p class="ft">Tap the part of the bike you want to cover.</p><p class="fo" aria-live="polite">&nbsp;</p></div>' +
+      '<svg viewBox="40 46 520 270" role="group" aria-label="Bike part finder">' +
+        '<defs><pattern id="cfv2-weave" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#26292E"/><rect width="4" height="4" fill="#30343A"/><rect x="4" y="4" width="4" height="4" fill="#30343A"/></pattern></defs>' +
+        '<g class="frame" aria-hidden="true">' +
+          '<circle cx="130" cy="240" r="62"/><circle cx="130" cy="240" r="44" class="rim"/><circle cx="478" cy="240" r="62"/><circle cx="478" cy="240" r="44" class="rim"/>' +
+          '<path d="M478 240 L462 112 M452 106 L478 98 M186 192 L262 180 M170 166 L268 204"/>' +
+        '</g>' +
+        zones.map(function (z) {
+          return '<a href="/product-category/' + z[0] + '/" data-z="' + z[0] + '" aria-label="' + esc(name[z[0]]) + ', ' + count[z[0]] + ' parts"><path d="' + z[1] + '"/></a>';
+        }).join('') +
+      '</svg>';
+    var out = $('.fo', box);
+    function show(a) { out.innerHTML = a ? '<b>' + esc(name[a]) + '</b> · ' + count[a] + (count[a] === 1 ? ' part' : ' parts') : '&nbsp;'; }
+    $$('a[data-z]', box).forEach(function (a) {
+      var z = a.getAttribute('data-z');
+      a.addEventListener('mouseenter', function () { show(z); });
+      a.addEventListener('focus', function () { show(z); });
+      a.addEventListener('mouseleave', function () { show(null); });
+    });
+    box.hidden = false;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* share a build: the cart as a link a friend (or partner) can open    */
+  /* ------------------------------------------------------------------ */
+  function shareButton(host, c) {
+    if ($('.cfv2-share', host)) return;
+    var ids = c.items.map(function (i) { return i.id; });
+    var url = location.origin + '/cart/?cf_build=' + ids.join('-');
+    var b = h('button', 'cfv2-share', ICON.share + '<span>Share this build</span>');
+    b.type = 'button';
+    b.addEventListener('click', function () {
+      var done = function () { $('span', b).textContent = 'Link copied'; setTimeout(function () { $('span', b).textContent = 'Share this build'; }, 2500); };
+      if (navigator.share) navigator.share({ title: 'My S1000RR carbon build', url: url }).catch(function () {});
+      else if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, function () { prompt('Copy this link', url); });
+      else prompt('Copy this link', url);
+    });
+    var at = $('.cart-collaterals', host) || host;
+    at.insertBefore(b, at.firstChild);
+  }
+  function sharedBuild(host) {
+    var m = location.search.match(/[?&]cf_build=([\d-]+)/);
+    if (!m) return;
+    var ids = m[1].split('-').map(Number).filter(Boolean).slice(0, 20);
+    products().then(function (all) {
+      var byId = {};
+      all.forEach(function (p) { byId[p.id] = p; });
+      var parts = ids.map(function (id) { return byId[id]; }).filter(function (p) { return p && p.is_purchasable && p.is_in_stock; });
+      if (!parts.length) return;
+      var t = kitTotal(parts), box = h('section', 'cfv2-kitbox cfv2-build');
+      box.innerHTML = '<p class="kh"><b>A shared build</b><span>' + parts.length + (parts.length === 1 ? ' part' : ' parts') + ' someone sent you</span></p>' +
+        '<ul>' + parts.map(function (p) {
+          return '<li><img src="' + esc(imgOf(p)) + '" alt="" loading="lazy" width="80" height="80"><span><a href="' + esc(p.permalink) + '">' + esc(short(p.name)) + '</a></span><b>' + money(priceOf(p)) + '</b></li>';
+        }).join('') + '</ul>' +
+        '<p class="kt"><span>Total</span><b>' + money(t) + '</b></p>' +
+        '<button type="button" class="kadd" data-kit="' + parts.map(function (p) { return p.id; }).join(',') + '">Add ' + (parts.length === 1 ? 'it' : 'all ' + parts.length) + ' to my cart</button>';
+      host.insertBefore(box, host.firstChild);
+    }).catch(function () {});
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* checkout: optional fields tucked behind one link                    */
+  /* ------------------------------------------------------------------ */
+  function slimCheckout() {
+    ['billing', 'shipping'].forEach(function (k) {
+      var fields = ['#' + k + '_company_field', '#' + k + '_address_2_field'].map(function (s) { return $(s); })
+        .filter(function (f) { return f && !f.classList.contains('validate-required') && !($('input', f) || {}).value; });
+      if (!fields.length || $('#cfv2-more-' + k)) return;
+      var b = h('button', 'cfv2-opt', '+ Add apartment, suite or company');
+      b.type = 'button';
+      b.id = 'cfv2-more-' + k;
+      fields.forEach(function (f) { f.hidden = true; });
+      var last = $('#' + k + '_address_1_field') || fields[0];
+      last.parentNode.insertBefore(b, last.nextSibling);
+      b.addEventListener('click', function () {
+        fields.forEach(function (f) { f.hidden = false; });
+        b.remove();
+        var i = $('input', fields[fields.length - 1]);
+        if (i) i.focus();
+      });
+    });
   }
 
   /* ------------------------------------------------------------------ */
@@ -1201,8 +1426,93 @@ html.cfv2 .woocommerce-form-coupon-toggle .woocommerce-info a{color:var(--ink)!i
   html.cfv2 .woocommerce-checkout #order_review_heading{padding-left:16px!important;}
   html.cfv2-cart .coupon input.input-text{width:100%!important;}
 }
+/* v2.5: pay-in-4 on cards */
+.cfv2-card .p4{margin:2px 0 0;font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums;}
+/* v2.5: header search */
+.cfv2-head .srch{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin-left:auto;border:1px solid #3A3D44;border-radius:999px;background:transparent;color:#fff;cursor:pointer;padding:0;}
+.cfv2-head .srch:hover{border-color:#fff;}
+.cfv2-head .srch svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;}
+.cfv2-head .srch + .cart{margin-left:10px!important;}
+/* v2.5: cart count pops when something is added */
+@keyframes cfv2pop{0%{transform:scale(1)}40%{transform:scale(1.45)}100%{transform:scale(1)}}
+.cfv2-count.pop{animation:cfv2pop .38s cubic-bezier(.2,.7,.2,1);}
+/* v2.5: phone tab bar */
+.cfv2-tabs{display:none;}
+@media (max-width:900px){
+  .cfv2-tabs{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:940;background:var(--night);border-top:1px solid #000;padding:0 0 env(safe-area-inset-bottom,0px);transition:transform .22s cubic-bezier(.2,.7,.2,1);}
+  .cfv2-tabs a,.cfv2-tabs button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:58px;padding:6px 2px;background:none;border:0;color:var(--night-mute)!important;text-decoration:none;font:inherit;font-size:12px;font-weight:600;cursor:pointer;touch-action:manipulation;}
+  .cfv2-tabs [aria-current]{color:#fff!important;}
+  .cfv2-tabs a:active,.cfv2-tabs button:active{color:#fff!important;background:var(--night2);}
+  .cfv2-tabs svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .cfv2-tabs span:not(.cfv2-count){max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cfv2-tabs .cfv2-count{position:absolute;top:5px;left:calc(50% + 6px);min-width:18px;height:18px;font-size:11px;}
+  html.cfv2-hastabs body{padding-bottom:calc(58px + env(safe-area-inset-bottom,0px))!important;}
+  html.cfv2-stickyon .cfv2-tabs{transform:translateY(110%);}
+  html.cfv2-hastabs #ast-scroll-top{bottom:76px!important;}
+}
+@media (max-width:640px){ .cfv2-head .srch{display:none;} }
+/* v2.5: search + bike sheets */
+.cfv2-search{position:fixed;inset:0;z-index:1100;}
+.cfv2-search .scrim{position:absolute;inset:0;background:rgba(10,11,13,.55);opacity:0;transition:opacity .2s;}
+.cfv2-search.open .scrim{opacity:1;}
+.cfv2-search .sbox{position:absolute;left:50%;top:8vh;width:min(640px,calc(100% - 32px));max-height:80vh;display:flex;flex-direction:column;background:var(--ground);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.35);transform:translate(-50%,-12px);opacity:0;transition:transform .2s cubic-bezier(.2,.7,.2,1),opacity .2s;outline:none;overflow:hidden;}
+.cfv2-search.open .sbox{transform:translate(-50%,0);opacity:1;}
+.cfv2-search .shead{display:flex;align-items:center;gap:8px;padding:12px;background:#fff;border-bottom:1px solid var(--line);}
+.cfv2-search .sf{flex:1;display:flex;align-items:center;gap:10px;min-height:48px;padding:0 12px;border:2px solid var(--ink);border-radius:var(--r);background:#fff;}
+.cfv2-search .sf svg{width:20px;height:20px;fill:none;stroke:var(--mute);stroke-width:2;flex:0 0 auto;}
+.cfv2-search .sf:focus-within{box-shadow:0 0 0 3px rgba(208,20,12,.25);}
+html.cfv2 .cfv2-search .sf input:focus,html.cfv2 .cfv2-search .sf input:focus-visible{outline:none!important;}
+.cfv2-search input{flex:1;min-width:0;border:0!important;outline:none!important;box-shadow:none!important;background:transparent!important;font:inherit;font-size:17px!important;color:var(--ink);padding:0!important;height:44px;}
+.cfv2-search .x{width:44px;height:44px;flex:0 0 auto;border:0;background:none;color:var(--ink);cursor:pointer;padding:10px;}
+.cfv2-search .x svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;}
+.cfv2-search .sres{overflow:auto;padding:8px 12px 16px;-webkit-overflow-scrolling:touch;}
+.cfv2-search .sh{margin:6px 4px 8px;font-size:13px;font-weight:700;color:var(--mute);}
+.cfv2-search .sr{display:flex;align-items:center;gap:12px;padding:8px;border-radius:var(--r);text-decoration:none;color:var(--ink)!important;}
+.cfv2-search .sr:hover,.cfv2-search .sr:focus{background:#fff;outline:none;box-shadow:0 0 0 1px var(--line);}
+.cfv2-search .sr img{width:56px;height:56px;object-fit:contain;background:#fff;border-radius:4px;box-shadow:0 0 0 1px #EEF0F2;padding:4px;box-sizing:border-box;flex:0 0 auto;}
+.cfv2-search .sr span{flex:1;min-width:0;display:flex;flex-direction:column;}
+.cfv2-search .sr b{font-weight:650;font-size:15.5px;line-height:1.3;}
+.cfv2-search .sr i{font-style:normal;font-size:13px;color:var(--mute);}
+.cfv2-search .sr i.is-mine{color:#17803D;font-weight:650;}
+.cfv2-search .sr em{font-style:normal;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.cfv2-search .none{padding:16px 4px;color:var(--mute);}
+.cfv2-bikes .st{flex:1;margin:0 0 0 4px;font-size:18px;font-weight:800;}
+.cfv2-bikes .opts{display:flex;flex-direction:column;gap:8px;padding:14px 12px 4px;}
+.cfv2-bikes .opts a{display:flex;align-items:center;justify-content:space-between;min-height:56px;padding:0 16px;background:#fff;border-radius:var(--r);box-shadow:0 0 0 1px var(--line);color:var(--ink)!important;text-decoration:none;font-weight:700;font-size:17px;}
+.cfv2-bikes .opts a[aria-current]{box-shadow:0 0 0 2px var(--ink);}
+.cfv2-bikes .opts i{font-style:normal;font-size:13px;font-weight:650;color:#17803D;}
+.cfv2-bikes .sn{margin:6px 16px 16px;font-size:14px;color:var(--mute);}
+@media (max-width:640px){
+  .cfv2-search .sbox{left:0;right:0;top:auto;bottom:0;width:100%;max-height:88vh;height:88vh;border-radius:14px 14px 0 0;transform:translateY(100%);opacity:1;padding-bottom:env(safe-area-inset-bottom,0px);}
+  .cfv2-search.open .sbox{transform:none;}
+  .cfv2-bikes .sbox{height:auto;}
+}
+/* v2.5: bike part finder */
+.cfv2-finder{display:grid;grid-template-columns:minmax(220px,1fr) 2fr;align-items:center;gap:16px 32px;margin:0 0 24px;padding:20px 24px;background:var(--night);border-radius:8px;color:var(--night-ink);}
+.cfv2-finder[hidden]{display:none;}
+.cfv2-finder .ft{margin:0;font-size:20px;font-weight:800;font-style:italic;font-stretch:112%;line-height:1.25;color:#fff;}
+.cfv2-finder .fo{margin:8px 0 0;min-height:1.5em;color:var(--night-mute);font-size:15px;}
+.cfv2-finder .fo b{color:#fff;}
+.cfv2-finder svg{width:100%;height:auto;display:block;}
+.cfv2-finder .frame{fill:none;stroke:#3E424A;stroke-width:5;stroke-linecap:round;}
+.cfv2-finder .frame .rim{stroke-width:2;stroke:#33363D;}
+.cfv2-finder a path{fill:url(#cfv2-weave);stroke:#8A8F99;stroke-width:1.5;stroke-linejoin:round;transition:fill .15s;cursor:pointer;}
+.cfv2-finder a:hover path,.cfv2-finder a:focus path{fill:var(--red);stroke:#fff;}
+.cfv2-finder a:focus{outline:none;}
+@media (max-width:700px){
+  .cfv2-finder{grid-template-columns:1fr;padding:16px;}
+  .cfv2-finder .ft{font-size:18px;}
+}
+/* v2.5: shared builds + checkout */
+.cfv2-share{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin:0 0 14px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);font:inherit;font-size:15px;font-weight:650;cursor:pointer;}
+.cfv2-share:hover{border-color:var(--ink);}
+.cfv2-share svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.cfv2-build{margin:0 0 24px;max-width:640px;}
+.cfv2-build li a{color:var(--ink)!important;}
+html.cfv2 .woocommerce-checkout .form-row[hidden]{display:none!important;}
+.cfv2-opt{display:block;margin:-4px 0 14px;padding:8px 0;min-height:44px;border:0;background:none;color:var(--ink);font:inherit;font-size:15px;font-weight:650;text-decoration:underline;cursor:pointer;clear:both;}
 @media (prefers-reduced-motion:reduce){
-  .cfv2-card .plate img,#cfv2-home .gen,.cfv2-drawer .panel,.cfv2-drawer .scrim,.cfv2-sticky{transition:none!important;}
+  .cfv2-card .plate img,#cfv2-home .gen,.cfv2-drawer .panel,.cfv2-drawer .scrim,.cfv2-sticky,.cfv2-tabs,.cfv2-search .sbox,.cfv2-count.pop{transition:none!important;animation:none!important;}
   .cfv2-card:hover .plate img{transform:none;}
   #cfv2-home .gen:hover{transform:none;}
 }
@@ -1251,6 +1561,7 @@ html.cfv2 .woocommerce-form-coupon-toggle .woocommerce-info a{color:var(--ink)!i
     else if (/single-product/.test(b)) pdp();
     else if (/(post-type-archive-product|tax-product_cat|woocommerce-shop)/.test(b)) shop();
     else if (/woocommerce-cart/.test(b)) cart();
+    if (/woocommerce-checkout/.test(b)) slimCheckout();
     if (/woocommerce-(cart|checkout)/.test(b)) {
       shortNames();
       var ot = $('#order_review') || $('.entry-content > .woocommerce');
