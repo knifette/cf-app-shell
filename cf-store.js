@@ -919,8 +919,9 @@
       b.type = 'button';
       b.id = 'cfv2-more-' + k;
       fields.forEach(function (f) { f.hidden = true; });
-      var last = $('#' + k + '_address_1_field') || fields[0];
-      last.parentNode.insertBefore(b, last.nextSibling);
+      var row = $('#' + k + '_address_1_field');
+      if (!row) { fields.forEach(function (f) { f.hidden = false; }); return; }
+      row.appendChild(b); /* inside the row, so WooCommerce's field reordering carries it along */
       b.addEventListener('click', function () {
         fields.forEach(function (f) { f.hidden = false; });
         b.remove();
@@ -1510,7 +1511,7 @@ html.cfv2 .cfv2-search .sf input:focus,html.cfv2 .cfv2-search .sf input:focus-vi
 .cfv2-build{margin:0 0 24px;max-width:640px;}
 .cfv2-build li a{color:var(--ink)!important;}
 html.cfv2 .woocommerce-checkout .form-row[hidden]{display:none!important;}
-.cfv2-opt{display:block;margin:-4px 0 14px;padding:8px 0;min-height:44px;border:0;background:none;color:var(--ink);font:inherit;font-size:15px;font-weight:650;text-decoration:underline;cursor:pointer;clear:both;}
+.cfv2-opt{display:block;margin:6px 0 0;padding:8px 0;min-height:44px;border:0!important;background:none!important;box-shadow:none!important;color:var(--ink);font:inherit;font-size:15px;font-weight:650;text-decoration:underline;cursor:pointer;clear:both;}
 @media (prefers-reduced-motion:reduce){
   .cfv2-card .plate img,#cfv2-home .gen,.cfv2-drawer .panel,.cfv2-drawer .scrim,.cfv2-sticky,.cfv2-tabs,.cfv2-search .sbox,.cfv2-count.pop{transition:none!important;animation:none!important;}
   .cfv2-card:hover .plate img{transform:none;}
