@@ -353,14 +353,16 @@
   function bikeBar(head) {
     var m = location.pathname.match(/\/product-category\/bmw\/s1000rr\/([\w-]+)\//);
     if (m && genBySlug(m[1])) setBike(m[1]);
-    var isHome = /(^|\s)home(\s|$)/.test(D.body.className);
+    var bc = D.body.className;
+    if (/woocommerce-(cart|checkout)/.test(bc)) return;
+    var quiet = /(^|\s)home(\s|$)|post-type-archive-product|tax-product_cat|woocommerce-shop/.test(bc);
     var bar = h('div', 'cfv2-bike');
     function draw(picking) {
       var b = myBike();
-      if (!b && isHome && !picking) { bar.hidden = true; return; }
+      if (!b && quiet && !picking) { bar.hidden = true; return; }
       bar.hidden = false;
       if (b && !picking) {
-        bar.innerHTML = '<div class="w"><p>Your bike: <b>' + esc(b.label) + '</b></p>' +
+        bar.innerHTML = '<div class="w one"><p>Your bike: <b>' + esc(b.label) + '</b></p>' +
           '<a href="' + GEN_URL + b.slug + '/">Shop its parts</a>' +
           '<button type="button" data-pick>Change</button></div>';
       } else {
@@ -521,6 +523,8 @@
     if (title) title.textContent = short(title.textContent);
 
     var summary = $('.summary', prod);
+    var sd = summary && $('.woocommerce-product-details__short-description', summary);
+    if (sd && title && sd.textContent.length < 120 && sd.textContent.toLowerCase().indexOf(title.textContent.toLowerCase()) > -1) sd.hidden = true;
     var price = summary && $('p.price', summary);
     if (price && !$('.cfv2-fit', summary)) {
       var fit = h('div', 'cfv2-fit');
@@ -637,6 +641,21 @@ html.cfv2 #primary,html.cfv2 #secondary{border:0!important;}
 html.cfv2 #cf-filter-btn{display:none!important;}
 html.cfv2-cart .cart_totals .StripeElement,html.cfv2-cart .cart_totals [id*="bnpl"],html.cfv2-cart .cart_totals [class*="bnpl"]{display:none!important;}
 .cfv2-more{clear:both;}
+html.cfv2 .woocommerce-message .button,html.cfv2 .woocommerce-info .button{background:var(--ink)!important;color:#fff!important;border-radius:var(--r)!important;font-weight:650!important;}
+html.cfv2-cart .cart_totals td{text-align:right!important;}
+html.cfv2-cart .coupon .button{white-space:nowrap;}
+@media (min-width:901px){
+  .cfv2-chips{flex-wrap:wrap;overflow:visible;}
+  html.cfv2-pdp div.product .summary{position:sticky;top:24px;align-self:start;}
+}
+@media (max-width:900px){
+  .cfv2-chips{-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent);padding-right:32px;}
+}
+@media (max-width:640px){
+  .cfv2-bike .one{flex-wrap:nowrap;}
+  .cfv2-bike .one p{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cfv2-bike .one > a{display:none;}
+}
 /* your-bike bar */
 .cfv2-bike{background:#fff;box-shadow:inset 0 -1px 0 var(--line);}
 .cfv2-bike .w{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;min-height:52px;padding-top:6px;padding-bottom:6px;}
@@ -1055,6 +1074,15 @@ html.cfv2 .woocommerce-form-coupon-toggle .woocommerce-info a{color:var(--ink)!i
     if (old) old.media = 'not all';
   }
 
+  function shortNames() {
+    $$('.shop_table .product-name').forEach(function (td) {
+      var t = $('a', td) || td;
+      [].forEach.call(t.childNodes, function (n) {
+        if (n.nodeType === 3 && /^\s*BMW\s+S1000RR\s+Carbon/i.test(n.nodeValue)) n.nodeValue = short(n.nodeValue) + ' ';
+      });
+    });
+  }
+
   /* ------------------------------------------------------------------ */
   /* boot                                                                */
   /* ------------------------------------------------------------------ */
@@ -1069,6 +1097,10 @@ html.cfv2 .woocommerce-form-coupon-toggle .woocommerce-info a{color:var(--ink)!i
     else if (/single-product/.test(b)) pdp();
     else if (/(post-type-archive-product|tax-product_cat|woocommerce-shop)/.test(b)) shop();
     else if (/woocommerce-cart/.test(b)) cart();
+    if (/woocommerce-(cart|checkout)/.test(b)) {
+      shortNames();
+      if (window.jQuery) window.jQuery(D.body).on('updated_checkout updated_cart_totals', shortNames);
+    }
 
     var grid = $('ul.products');
     if (grid && window.MutationObserver) {
