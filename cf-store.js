@@ -692,6 +692,34 @@ body.page-template-elementor_canvas section.intro{padding-top:72px!important;pad
 body.page-template-elementor_canvas section.intro h1{color:#fff!important;}
 body.page-template-elementor_canvas .form-card h2{color:#fff!important;}
 body.page-template-elementor_canvas .cinfo .block > :first-child{color:var(--mute)!important;}
+/* contact page: same type and colours as the rest of the store */
+body.page-template-elementor_canvas section.intro{background:var(--night)!important;background-image:none!important;}
+body.page-template-elementor_canvas section.intro .eyebrow{display:none!important;}
+body.page-template-elementor_canvas section.intro h1{font-family:var(--disp)!important;font-size:clamp(40px,6vw,76px)!important;line-height:.95!important;font-weight:850!important;font-style:italic!important;font-stretch:118%;letter-spacing:-.025em!important;}
+body.page-template-elementor_canvas section.intro p{color:var(--night-mute)!important;}
+body.page-template-elementor_canvas .cinfo .k{font-family:var(--disp)!important;font-size:14px!important;font-weight:600!important;text-transform:none!important;letter-spacing:0!important;}
+body.page-template-elementor_canvas .cinfo .v,body.page-template-elementor_canvas .cinfo .v a{font-family:var(--disp)!important;font-size:20px!important;font-weight:700!important;color:var(--ink)!important;}
+body.page-template-elementor_canvas .cinfo .d{font-size:15px!important;color:var(--mute)!important;}
+body.page-template-elementor_canvas .form-card{background:var(--night)!important;}
+body.page-template-elementor_canvas .form-card h2{font-family:var(--disp)!important;font-style:italic;font-weight:800!important;font-stretch:112%;}
+body.page-template-elementor_canvas .form-card .fsub{font-size:15px!important;color:var(--night-mute)!important;}
+body.page-template-elementor_canvas .form-card label{font-size:14px!important;font-weight:600!important;text-transform:none!important;letter-spacing:0!important;color:var(--night-ink)!important;}
+body.page-template-elementor_canvas .form-card input,body.page-template-elementor_canvas .form-card textarea{background:var(--night2)!important;font-size:16px!important;}
+body.page-template-elementor_canvas .form-card ::placeholder{color:#6E727A!important;opacity:1;}
+body.page-template-elementor_canvas .form-card .formnote{font-size:13px!important;color:var(--night-mute)!important;}
+@media (max-width:640px){
+  html.cfv2-cart table.cart tr.cart_item{display:grid!important;grid-template-columns:72px 1fr auto;grid-template-areas:"img name rm" "img qty sub";column-gap:14px;row-gap:8px;align-items:center;padding:14px!important;}
+  html.cfv2-cart table.cart tr.cart_item td{display:block!important;padding:0!important;border:0!important;text-align:left!important;background:none!important;min-height:0!important;}
+  html.cfv2-cart table.cart tr.cart_item td::before{display:none!important;}
+  html.cfv2-cart table.cart td.product-thumbnail{grid-area:img;}
+  html.cfv2-cart table.cart td.product-thumbnail img{width:72px!important;height:72px!important;}
+  html.cfv2-cart table.cart td.product-name{grid-area:name;font-weight:650;}
+  html.cfv2-cart table.cart td.product-remove{grid-area:rm;}
+  html.cfv2-cart table.cart tr.cart_item td.product-price{display:none!important;}
+  html.cfv2-cart table.cart td.product-quantity{grid-area:qty;}
+  html.cfv2-cart table.cart td.product-quantity .quantity{margin:0!important;}
+  html.cfv2-cart table.cart td.product-subtotal{grid-area:sub;font-weight:700;text-align:right!important;}
+}
 html.cfv2 .woocommerce-info,html.cfv2 .woocommerce-message,html.cfv2 .woocommerce-error,html.cfv2 .wc-block-components-notice-banner{background:#fff!important;color:var(--ink)!important;border:0!important;border-left:4px solid var(--ink)!important;border-radius:var(--r)!important;box-shadow:0 0 0 1px var(--line);}
 html.cfv2 .woocommerce-error,html.cfv2 .wc-block-components-notice-banner.is-error{border-left-color:var(--red)!important;}
 html.cfv2 .woocommerce-info::before,html.cfv2 .woocommerce-message::before{color:var(--ink)!important;}
@@ -870,7 +898,7 @@ html.cfv2-pdp .woocommerce-product-gallery__wrapper{background:#fff;border-radiu
 html.cfv2-pdp .woocommerce-product-gallery__image img{width:100%!important;aspect-ratio:1/1;object-fit:contain!important;background:#fff;padding:6%;box-sizing:border-box;}
 html.cfv2-pdp .flex-control-thumbs{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px!important;}
 html.cfv2-pdp .flex-control-thumbs li{width:auto!important;margin:0!important;float:none!important;}
-html.cfv2-pdp .flex-control-thumbs img{aspect-ratio:1/1;object-fit:contain;background:#fff;border-radius:4px;box-shadow:0 0 0 1px var(--line);padding:6%;opacity:.7;}
+html.cfv2-pdp .flex-control-thumbs img{aspect-ratio:1/1;object-fit:contain;background:#fff;border-radius:4px;box-shadow:0 0 0 1px var(--line);padding:6%;opacity:.85;}
 html.cfv2-pdp .flex-control-thumbs img.flex-active,html.cfv2-pdp .flex-control-thumbs img:hover{opacity:1;box-shadow:0 0 0 2px var(--ink);}
 html.cfv2-pdp .woocommerce-product-gallery__trigger{display:none!important;}
 html.cfv2-pdp .summary .woocommerce-breadcrumb{margin-bottom:12px!important;}
@@ -1081,6 +1109,11 @@ html.cfv2 .woocommerce-form-coupon-toggle .woocommerce-info a{color:var(--ink)!i
         if (n.nodeType === 3 && /^\s*BMW\s+S1000RR\s+Carbon/i.test(n.nodeValue)) n.nodeValue = short(n.nodeValue) + ' ';
       });
     });
+    $$('.woocommerce-message').forEach(function (m) {
+      [].forEach.call(m.childNodes, function (n) {
+        if (n.nodeType === 3) n.nodeValue = n.nodeValue.replace(/BMW\s+S1000RR\s+Carbon\s+Fib(?:er|re)\s+/gi, '');
+      });
+    });
   }
 
   /* ------------------------------------------------------------------ */
@@ -1099,7 +1132,8 @@ html.cfv2 .woocommerce-form-coupon-toggle .woocommerce-info a{color:var(--ink)!i
     else if (/woocommerce-cart/.test(b)) cart();
     if (/woocommerce-(cart|checkout)/.test(b)) {
       shortNames();
-      if (window.jQuery) window.jQuery(D.body).on('updated_checkout updated_cart_totals', shortNames);
+      var ot = $('#order_review') || $('.entry-content > .woocommerce');
+      if (ot && window.MutationObserver) new MutationObserver(shortNames).observe(ot, { childList: true, subtree: true });
     }
 
     var grid = $('ul.products');
