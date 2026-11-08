@@ -76,6 +76,22 @@
     if (gens.length === 1) return 'Fits ' + gens[0].label;
     return 'Fits S1000RR ' + a + '–' + (b || (last.from + '+'));
   }
+  /* the visitor's bike, remembered on this device once they pick a year */
+  function genBySlug(sl) { return GENS.filter(function (g) { return g.slug === sl; })[0] || null; }
+  function myBike() {
+    try { return genBySlug(localStorage.getItem('cfv2_bike')); } catch (e) { return null; }
+  }
+  function setBike(sl) {
+    try { if (sl) localStorage.setItem('cfv2_bike', sl); else localStorage.removeItem('cfv2_bike'); } catch (e) {}
+  }
+  function fitsMine(slugs) {
+    var b = myBike();
+    return b ? slugs.indexOf(b.slug) > -1 : null;
+  }
+  function payIn4(n) {
+    if (!(n >= 35 && n <= 2000)) return '';
+    return 'or 4 interest-free payments of ' + money(Math.ceil(n / 4 * 100) / 100) + ' with Klarna or Afterpay';
+  }
   function imgOf(p, big) {
     var im = p.images && p.images[0];
     if (!im) return '';
@@ -167,11 +183,12 @@
   function card(p, small) {
     var a = h('article', 'cfv2-card' + (small ? ' is-small' : ''));
     var fit = fitLabel(gensOf(slugsOf(p)));
+    var mine = fitsMine(slugsOf(p));
     var buy = p.is_purchasable && p.is_in_stock && p.type === 'simple';
     a.innerHTML =
       '<a class="plate" href="' + esc(p.permalink) + '" tabindex="-1" aria-hidden="true"><img src="' + esc(imgOf(p)) + '" alt="" loading="lazy" width="600" height="600"></a>' +
       '<div class="meta"><h3><a href="' + esc(p.permalink) + '">' + esc(short(p.name)) + '</a></h3>' +
-      (fit ? '<p class="fit">' + esc(fit) + '</p>' : '') +
+      (fit ? '<p class="fit' + (mine ? ' is-mine' : '') + '">' + (mine ? ICON.check + 'Fits your bike' : esc(fit)) + '</p>' : '') +
       '<div class="buy"><span class="price">' + money(priceOf(p)) + '</span>' +
       (buy ? '<button type="button" class="cfv2-add" data-id="' + p.id + '">Add to cart</button>'
            : '<a class="cfv2-add" href="' + esc(p.permalink) + '">View</a>') +
@@ -222,6 +239,11 @@
         '<div><p class="nm">' + esc(short(item.name)) + '</p><p class="qt">Qty ' + item.quantity + '</p></div>' +
         '<p class="pr">' + money((+item.totals.line_subtotal) / Math.pow(10, item.totals.currency_minor_unit || 2)) + '</p></div>';
     }
+    var bike = myBike();
+    if (item && bike && cart.__slugs && cart.__slugs.indexOf(bike.slug) < 0) {
+      html += '<p class="cfv2-warn">This part is listed for ' + esc(fitLabel(gensOf(cart.__slugs)).replace(/^Fits /, '')) +
+        ', not your ' + esc(bike.label) + '. Sales are final, so <a href="/contact/">ask us</a> if you are not sure.</p>';
+    }
     html += '<div class="sub"><span>Cart subtotal (' + cart.items_count + (cart.items_count === 1 ? ' item' : ' items') + ')</span><b>' + money(total) + '</b></div>';
     html += shipLine(total);
     html += '<div class="acts"><a class="cfv2-btn" href="/checkout/">Check out</a><a class="cfv2-btn ghost" href="/cart/">View cart</a></div>';
@@ -253,9 +275,19 @@
       e.preventDefault();
       e.stopPropagation();
       busy(b, true);
-      addToCart(id, 1).then(function (c) { busy(b, false); openDrawer(id, c); })
+      addToCart(id, 1).then(withSlugs(id)).then(function (c) { busy(b, false); openDrawer(id, c); })
         .catch(function () { busy(b, false); location.href = '/?add-to-cart=' + id; });
     }, true);
+  }
+  /* attach the added part's categories so the drawer can check it against the visitor's bike */
+  function withSlugs(id) {
+    return function (c) {
+      return products().then(function (all) {
+        var p = all.filter(function (x) { return x.id === +id; })[0];
+        c.__slugs = p ? slugsOf(p) : null;
+        return c;
+      }, function () { return c; });
+    };
   }
   function busy(b, on) {
     if (on) { b.setAttribute('aria-busy', 'true'); b.__t = b.textContent; b.textContent = 'Adding…'; b.disabled = true; }
@@ -289,6 +321,8 @@
     D.body.insertBefore(head, D.body.firstChild);
     D.body.insertBefore(bar, head);
 
+    bikeBar(head);
+
     var burger = $('.burger', head), menu = $('.menu', head);
     burger.addEventListener('click', function () {
       var open = menu.hidden;
@@ -313,6 +347,40 @@
       '</div>' +
       '<p class="copy">© ' + new Date().getFullYear() + ' Carbon Freaks</p>';
     D.body.appendChild(foot);
+  }
+
+  /* "Your bike" bar: shows the remembered year, or asks for it */
+  function bikeBar(head) {
+    var m = location.pathname.match(/\/product-category\/bmw\/s1000rr\/([\w-]+)\//);
+    if (m && genBySlug(m[1])) setBike(m[1]);
+    var isHome = /(^|\s)home(\s|$)/.test(D.body.className);
+    var bar = h('div', 'cfv2-bike');
+    function draw(picking) {
+      var b = myBike();
+      if (!b && isHome && !picking) { bar.hidden = true; return; }
+      bar.hidden = false;
+      if (b && !picking) {
+        bar.innerHTML = '<div class="w"><p>Your bike: <b>' + esc(b.label) + '</b></p>' +
+          '<a href="' + GEN_URL + b.slug + '/">Shop its parts</a>' +
+          '<button type="button" data-pick>Change</button></div>';
+      } else {
+        bar.innerHTML = '<div class="w"><p>' + (b ? 'Change your bike:' : 'Pick your bike:') + '</p><div class="opts">' +
+          GENS.map(function (g) {
+            return '<button type="button" data-bike="' + g.slug + '"' + (b && b.slug === g.slug ? ' aria-pressed="true"' : '') + '>' + g.label.replace('S1000RR ', '') + '</button>';
+          }).join('') + (b ? '<button type="button" data-bike="">Clear</button>' : '') + '</div></div>';
+      }
+    }
+    bar.addEventListener('click', function (e) {
+      var t = e.target.closest('button');
+      if (!t) return;
+      if (t.hasAttribute('data-pick')) { draw(true); return; }
+      var sl = t.getAttribute('data-bike');
+      setBike(sl);
+      if (sl) location.href = GEN_URL + sl + '/';
+      else location.reload();
+    });
+    draw(false);
+    head.parentNode.insertBefore(bar, head.nextSibling);
   }
 
   /* ------------------------------------------------------------------ */
@@ -353,8 +421,10 @@
       var byId = {};
       all.forEach(function (p) { byId[p.id] = p; });
 
+      var bike = myBike();
       $$('.gen', root).forEach(function (a) {
         var g = GENS.filter(function (x) { return x.slug === a.getAttribute('data-gen'); })[0];
+        if (bike && bike.slug === g.slug) { a.classList.add('is-mine'); $('.gt', a).insertAdjacentHTML('afterbegin', '<span class="tag">Your bike</span>'); }
         var list = all.filter(function (p) { return slugsOf(p).indexOf(g.slug) > -1; });
         var low = Math.min.apply(null, list.map(priceOf));
         var hp = byId[g.hero] || list[0];
@@ -363,7 +433,18 @@
       });
 
       var grid = $('.grid', root);
-      FEATURED.forEach(function (id) { if (byId[id]) grid.appendChild(card(byId[id])); });
+      var picks = FEATURED.map(function (id) { return byId[id]; }).filter(Boolean);
+      if (bike) {
+        var fits = function (p) { return slugsOf(p).indexOf(bike.slug) > -1 && p.is_purchasable && p.is_in_stock; };
+        var rest = all.filter(function (p) { return fits(p) && FEATURED.indexOf(p.id) < 0; })
+          .sort(function (a, b) { return priceOf(b) - priceOf(a); });
+        picks = picks.filter(fits).concat(rest).slice(0, 8);
+        var sh = grid.parentNode;
+        $('.sh h2', sh).textContent = 'Parts for your ' + bike.label;
+        $('.sh a', sh).href = GEN_URL + bike.slug + '/';
+        $('.sh a', sh).textContent = 'See all parts for your bike';
+      }
+      picks.forEach(function (p) { grid.appendChild(card(p)); });
       grid.removeAttribute('aria-busy');
 
       var box = $('.areas', root);
@@ -418,7 +499,8 @@
       var fit = fitLabel(gensOf(m));
       if (fit && t && !$('.fit', li)) {
         var f = h('p', 'fit');
-        f.textContent = fit;
+        if (fitsMine(m)) { f.className = 'fit is-mine'; f.innerHTML = ICON.check + 'Fits your bike'; }
+        else f.textContent = fit;
         t.parentNode.insertBefore(f, t.nextSibling);
       }
     });
@@ -442,9 +524,21 @@
     var price = summary && $('p.price', summary);
     if (price && !$('.cfv2-fit', summary)) {
       var fit = h('div', 'cfv2-fit');
-      fit.innerHTML = ICON.check + '<p><b>' + esc(gens.length ? fitLabel(gens) : 'Check fitment') + '</b>' +
-        '<span>Not sure? <a href="/contact/">Ask us to confirm</a> before you buy. Sales are final.</span></p>';
+      var bike = myBike(), mine = fitsMine(cats);
+      if (bike && mine === false && gens.length) {
+        fit.className = 'cfv2-fit is-no';
+        fit.innerHTML = '<span class="ic">!</span><p><b>Not for your ' + esc(bike.label) + '</b>' +
+          '<span>This part is listed for ' + esc(fitLabel(gens).replace(/^Fits /, '')) + '. <a href="' + GEN_URL + bike.slug + '/">See parts for your bike</a> or <a href="/contact/">ask us</a>.</span></p>';
+      } else {
+        fit.innerHTML = ICON.check + '<p><b>' + esc(mine ? 'Fits your ' + bike.label : (gens.length ? fitLabel(gens) : 'Check fitment')) + '</b>' +
+          '<span>Not sure? <a href="/contact/">Ask us to confirm</a> before you buy. Sales are final.</span></p>';
+      }
       price.parentNode.insertBefore(fit, price.nextSibling);
+      products().then(function (all) {
+        var me = all.filter(function (p) { return p.id === id; })[0];
+        var line = me && payIn4(priceOf(me));
+        if (line && !$('.cfv2-p4', summary)) price.insertAdjacentHTML('afterend', '<p class="cfv2-p4">' + esc(line) + '</p>');
+      }).catch(function () {});
     }
 
     var form = summary && $('form.cart', summary);
@@ -464,7 +558,7 @@
         e.preventDefault();
         var q = +(($('input.qty', form) || {}).value) || 1;
         busy(btn, true);
-        addToCart(pid, q).then(function (c) { busy(btn, false); openDrawer(pid, c); })
+        addToCart(pid, q).then(withSlugs(pid)).then(function (c) { busy(btn, false); openDrawer(pid, c); })
           .catch(function () { busy(btn, false); form.submit(); });
       });
 
@@ -543,6 +637,26 @@ html.cfv2 #primary,html.cfv2 #secondary{border:0!important;}
 html.cfv2 #cf-filter-btn{display:none!important;}
 html.cfv2-cart .cart_totals .StripeElement,html.cfv2-cart .cart_totals [id*="bnpl"],html.cfv2-cart .cart_totals [class*="bnpl"]{display:none!important;}
 .cfv2-more{clear:both;}
+/* your-bike bar */
+.cfv2-bike{background:#fff;box-shadow:inset 0 -1px 0 var(--line);}
+.cfv2-bike .w{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;min-height:52px;padding-top:6px;padding-bottom:6px;}
+.cfv2-bike p{margin:0;font-size:15px;color:var(--mute);}
+.cfv2-bike p b{color:var(--ink);}
+.cfv2-bike a,.cfv2-bike button{min-height:40px;display:inline-flex;align-items:center;padding:0 14px;border-radius:999px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;}
+.cfv2-bike a{background:var(--ink);color:#fff!important;}
+.cfv2-bike button{background:transparent;border:0;box-shadow:inset 0 0 0 1px var(--line);color:var(--ink);}
+.cfv2-bike button:hover{box-shadow:inset 0 0 0 1.5px var(--ink);}
+.cfv2-bike button[aria-pressed="true"]{background:var(--ink);color:#fff;box-shadow:none;}
+.cfv2-bike .opts{display:flex;gap:8px;flex-wrap:wrap;}
+.cfv2 .fit.is-mine{display:flex;align-items:center;gap:4px;color:#17803D!important;font-weight:600;}
+.cfv2 .fit.is-mine svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.5;flex:0 0 auto;}
+#cfv2-home .gen.is-mine{box-shadow:0 0 0 3px var(--red);}
+#cfv2-home .gen .tag{align-self:flex-start;margin-bottom:4px;padding:2px 8px;border-radius:999px;background:var(--red);color:#fff;font-size:12px;font-weight:700;}
+html.cfv2-pdp .cfv2-p4{margin:-6px 0 14px!important;font-size:15px;color:var(--mute);}
+html.cfv2-pdp .cfv2-fit.is-no{box-shadow:0 0 0 1.5px var(--red);}
+html.cfv2-pdp .cfv2-fit.is-no .ic{flex:0 0 24px;width:24px;height:24px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;}
+.cfv2-warn{margin:0 0 14px;padding:12px 14px;border-radius:var(--r);background:#FDECEB;color:#7A0D07!important;font-size:14px;line-height:1.45;}
+.cfv2-warn a{color:inherit!important;font-weight:700;}
 /* product page: one buy button; description sits under the photos */
 html.cfv2-pdp .summary > .ppc-button-wrapper,html.cfv2-pdp .summary > .ppcp-messages{display:none!important;}
 html.cfv2-pdp div.product > .summary{grid-row:1 / span 2;}
