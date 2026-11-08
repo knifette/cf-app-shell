@@ -18,7 +18,7 @@ if (window.__cfV2) {
   (function () {
     if (document.getElementById('cf-store-js')) return;
     var s = document.createElement('script'); s.id = 'cf-store-js'; s.async = false;
-    s.src = 'https://cdn.jsdelivr.net/gh/knifette/cf-app-shell@v2.5.2/cf-store.js';
+    s.src = 'https://cdn.jsdelivr.net/gh/knifette/cf-app-shell@v2.6.0/cf-store.js';
     (document.head || document.documentElement).appendChild(s);
   })();
 } else {
