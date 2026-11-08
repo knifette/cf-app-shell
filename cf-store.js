@@ -34,6 +34,19 @@
     ['windshields', 'Windshields'],
     ['mirrors', 'Mirrors']
   ];
+  /* sets: parts for the same area of the same bike, sold together at the plain sum of their prices */
+  var KITS = [
+    { area: 'Front fairing', gen: 's1000rr-2019-2022', ids: [948, 952, 950, 958] },
+    { area: 'Front fairing', gen: 's1000rr-2025', ids: [3626, 3629, 3632] },
+    { area: 'Side panel', gen: 's1000rr-2023-2024', ids: [3596, 3549] },
+    { area: 'Side panel', gen: 's1000rr-2025', ids: [3640, 3549] },
+    { area: 'Tail', gen: 's1000rr-2019-2022', ids: [972, 974, 976, 3560] },
+    { area: 'Tank', gen: 's1000rr-2019-2022', ids: [962, 956, 3544] },
+    { area: 'Tank', gen: 's1000rr-2023-2024', ids: [3592, 3544] },
+    { area: 'Belly and subframe', gen: 's1000rr-2023-2024', ids: [3603, 3605] },
+    { area: 'Belly and subframe', gen: 's1000rr-2025', ids: [3603, 3605] },
+    { area: 'Engine guard', gen: 's1000rr-2019-2022', ids: [986, 990, 3572, 988, 3532] }
+  ];
   var FEATURED = [964, 3636, 3520, 3589, 3554, 974, 3567, 3524];
 
   R.classList.add('cfv2');
@@ -230,15 +243,18 @@
   function openDrawer(addedId, cart) {
     lastFocus = D.activeElement;
     var body = $('.dbody', drawer);
-    var item = (cart.items || []).filter(function (i) { return i.id === +addedId; })[0];
+    var added = [].concat(addedId).map(Number);
+    addedId = added[0];
+    var lines = (cart.items || []).filter(function (i) { return added.indexOf(i.id) > -1; });
+    var item = lines[0];
     var total = cartTotal(cart);
     var html = '';
-    if (item) {
-      var im = item.images && item.images[0];
+    lines.forEach(function (it) {
+      var im = it.images && it.images[0];
       html += '<div class="line"><span class="thumb">' + (im ? '<img src="' + esc(im.thumbnail || im.src) + '" alt="">' : '') + '</span>' +
-        '<div><p class="nm">' + esc(short(item.name)) + '</p><p class="qt">Qty ' + item.quantity + '</p></div>' +
-        '<p class="pr">' + money((+item.totals.line_subtotal) / Math.pow(10, item.totals.currency_minor_unit || 2)) + '</p></div>';
-    }
+        '<div><p class="nm">' + esc(short(it.name)) + '</p><p class="qt">Qty ' + it.quantity + '</p></div>' +
+        '<p class="pr">' + money((+it.totals.line_subtotal) / Math.pow(10, it.totals.currency_minor_unit || 2)) + '</p></div>';
+    });
     var bike = myBike();
     if (item && bike && cart.__slugs && cart.__slugs.indexOf(bike.slug) < 0) {
       html += '<p class="cfv2-warn">This part is listed for ' + esc(fitLabel(gensOf(cart.__slugs)).replace(/^Fits /, '')) +
@@ -257,6 +273,7 @@
       var base = all.filter(function (p) { return p.id === +addedId; })[0];
       var inCart = (cart.items || []).map(function (i) { return i.id; });
       var list = suggest(all, base ? slugsOf(base) : [], inCart, 3);
+      if (added.length > 1) list = [];
       var g = $('.mgrid', drawer);
       if (!g) return;
       g.removeAttribute('aria-busy');
@@ -279,6 +296,41 @@
         .catch(function () { busy(b, false); location.href = '/?add-to-cart=' + id; });
     }, true);
   }
+  function kitParts(k, byId) {
+    return k.ids.map(function (id) { return byId[id]; }).filter(function (p) { return p && p.is_purchasable && p.is_in_stock; });
+  }
+  function kitTotal(parts) { return parts.reduce(function (t, p) { return t + priceOf(p); }, 0); }
+  function kitsFor(gen, partId) {
+    return KITS.filter(function (k) { return (!gen || k.gen === gen) && (!partId || k.ids.indexOf(partId) > -1); });
+  }
+  D.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-kit]');
+    if (!b) return;
+    var ids = b.getAttribute('data-kit').split(',').map(Number);
+    busy(b, true);
+    loadCart().then(function (c) {
+      var have = (c.items || []).map(function (i) { return i.id; });
+      return ids.filter(function (id) { return have.indexOf(id) < 0; }).reduce(function (pr, id) {
+        return pr.then(function () { return addToCart(id, 1); });
+      }, Promise.resolve(c));
+    }).then(withSlugs(ids[0])).then(function (c) { busy(b, false); openDrawer(ids, c); })
+      .catch(function () { busy(b, false); location.href = '/cart/'; });
+  });
+  function kitCard(k, parts) {
+    var g = genBySlug(k.gen), t = kitTotal(parts);
+    var a = h('article', 'cfv2-kit');
+    a.innerHTML = '<div class="ims">' + parts.slice(0, 4).map(function (p) {
+        return '<a href="' + esc(p.permalink) + '" tabindex="-1" aria-hidden="true"><img src="' + esc(imgOf(p)) + '" alt="" loading="lazy" width="300" height="300"></a>';
+      }).join('') + '</div>' +
+      '<h3>' + esc(k.area) + ' set</h3><p class="kb">' + esc(g.label) + ' · ' + parts.length + ' parts</p>' +
+      '<ul>' + parts.map(function (p) {
+        return '<li><a href="' + esc(p.permalink) + '">' + esc(short(p.name)) + '</a><span>' + money(priceOf(p)) + '</span></li>';
+      }).join('') + '</ul>' +
+      '<p class="kt"><b>' + money(t) + '</b>' + (t >= FREESHIP ? '<span class="free">' + ICON.truck + 'Ships free</span>' : '') + '</p>' +
+      '<button type="button" class="kadd" data-kit="' + parts.map(function (p) { return p.id; }).join(',') + '">Add all ' + parts.length + ' to cart</button>';
+    return a;
+  }
+
   /* attach the added part's categories so the drawer can check it against the visitor's bike */
   function withSlugs(id) {
     return function (c) {
@@ -409,6 +461,7 @@
         '<p class="ask">Not sure which year you ride? <a href="/contact/">Ask us first</a>. Every sale is final, so we confirm fit before you buy.</p>' +
       '</div></section>' +
       '<section class="sec"><div class="w"><div class="sh"><h2>Featured parts</h2><a href="/shop/">See all 53 parts</a></div><div class="grid" aria-busy="true"></div></div></section>' +
+      '<section class="sec kits" hidden><div class="w"><div class="sh"><h2>Buy it as a set</h2></div><p class="kl">Parts for the same area of your bike, added to your cart in one tap. The set price is the parts added up.</p><div class="cfv2-kits"></div></div></section>' +
       '<section class="sec"><div class="w"><div class="sh"><h2>Shop by part</h2></div><div class="areas" aria-busy="true"></div></div></section>' +
       '<section class="facts"><div class="w">' +
         '<p>' + ICON.truck + '<span><b>Free US shipping over ' + money(FREESHIP) + '</b>We ship to all 50 states. Smaller orders pay shipping at checkout.</span></p>' +
@@ -448,6 +501,17 @@
       }
       picks.forEach(function (p) { grid.appendChild(card(p)); });
       grid.removeAttribute('aria-busy');
+
+      // sets: the visitor's bike only, or a mix across the three years
+      var ks = bike ? kitsFor(bike.slug) : GENS.reduce(function (acc, g, i) {
+        return acc.concat(kitsFor(g.slug).slice(0, 2));
+      }, []);
+      var kbox = $('.cfv2-kits', root);
+      ks.slice(0, 6).forEach(function (k) {
+        var parts = kitParts(k, byId);
+        if (parts.length > 1) kbox.appendChild(kitCard(k, parts));
+      });
+      if (kbox.children.length) $('.kits', root).hidden = false;
 
       var box = $('.areas', root);
       AREAS.forEach(function (ar) {
@@ -581,6 +645,25 @@
       }
     }
 
+    /* the set this part belongs to */
+    if (summary && form) products().then(function (all) {
+      var byId = {};
+      all.forEach(function (p) { byId[p.id] = p; });
+      var bike = myBike();
+      var ks = kitsFor(null, id).sort(function (a, b) { return (bike && b.gen === bike.slug) - (bike && a.gen === bike.slug); });
+      var k = ks[0], parts = k && kitParts(k, byId);
+      if (!parts || parts.length < 2 || $('.cfv2-kitbox', summary)) return;
+      var t = kitTotal(parts), box = h('div', 'cfv2-kitbox');
+      box.innerHTML = '<p class="kh"><b>Make it a set</b><span>' + esc(k.area) + ' set · ' + esc(genBySlug(k.gen).label) + '</span></p>' +
+        '<ul>' + parts.map(function (p) {
+          return '<li' + (p.id === id ? ' class="is-this"' : '') + '><img src="' + esc(imgOf(p)) + '" alt="" loading="lazy" width="80" height="80"><span>' + esc(short(p.name)) + (p.id === id ? ' <i>this part</i>' : '') + '</span><b>' + money(priceOf(p)) + '</b></li>';
+        }).join('') + '</ul>' +
+        '<p class="kt"><span>' + parts.length + ' parts</span><b>' + money(t) + '</b></p>' +
+        (t >= FREESHIP ? '<p class="free">' + ICON.truck + 'The set ships free</p>' : '') +
+        '<button type="button" class="kadd" data-kit="' + parts.map(function (p) { return p.id; }).join(',') + '">Add the set to cart</button>';
+      form.parentNode.insertBefore(box, form.nextSibling);
+    }).catch(function () {});
+
     /* "Complete the build": parts that fit the same bike, from other areas */
     var after = $('.woocommerce-tabs', prod) || $('.related', prod) || prod.lastElementChild;
     products().then(function (all) {
@@ -641,12 +724,49 @@ html.cfv2 #primary,html.cfv2 #secondary{border:0!important;}
 html.cfv2 #cf-filter-btn{display:none!important;}
 html.cfv2-cart .cart_totals .StripeElement,html.cfv2-cart .cart_totals [id*="bnpl"],html.cfv2-cart .cart_totals [class*="bnpl"]{display:none!important;}
 .cfv2-more{clear:both;}
+html.cfv2 .shop_table .product-quantity{margin-left:4px;}
+html.cfv2 .woocommerce-message:focus,html.cfv2 .woocommerce-info:focus,html.cfv2 .woocommerce-notices-wrapper:focus{outline:none!important;}
+/* sets */
+#cfv2-home .kl{margin:-6px 0 20px;color:var(--mute);font-size:15px;max-width:60ch;}
+.cfv2-kits{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.cfv2-kit{display:flex;flex-direction:column;gap:10px;background:#fff;border-radius:var(--r);box-shadow:0 0 0 1px var(--line);padding:16px;}
+.cfv2-kit .ims{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:4px;}
+.cfv2-kit .ims a{display:block;aspect-ratio:1/1;background:#fff;border-radius:4px;box-shadow:0 0 0 1px #EEF0F2;}
+html.cfv2 #ast-scroll-top{background:var(--ink)!important;color:#fff!important;border-radius:var(--r)!important;}
+.cfv2-kit .ims img{width:100%;height:100%;object-fit:contain;padding:8%;box-sizing:border-box;display:block;}
+.cfv2-kit h3{margin:0;font-size:21px;font-weight:800;font-style:italic;font-stretch:112%;letter-spacing:-.01em;}
+.cfv2-kit .kb{margin:-6px 0 0;font-size:14px;color:var(--mute);}
+.cfv2-kit ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--line);}
+.cfv2-kit li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #EEF0F2;font-size:14.5px;}
+.cfv2-kit li a{color:var(--ink)!important;text-decoration:none;}
+.cfv2-kit li a:hover{text-decoration:underline;}
+.cfv2-kit li span{color:var(--mute);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.cfv2-kit .kt,.cfv2-kitbox .kt{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 0;margin-top:auto;}
+.cfv2-kit .kt b{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;}
+.cfv2-kit .free,.cfv2-kitbox .free{display:inline-flex;align-items:center;gap:6px;color:#17803D;font-weight:650;font-size:14px;}
+.cfv2-kit .free svg,.cfv2-kitbox .free svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;}
+.cfv2 .kadd{min-height:48px;width:100%;border:0;border-radius:var(--r);background:var(--ink);color:#fff;font:inherit;font-size:16px;font-weight:700;cursor:pointer;}
+.cfv2 .kadd:hover{background:#000;}
+.cfv2 .kadd[aria-busy]{opacity:.7;}
+.cfv2-kitbox{margin:18px 0;padding:16px;background:#fff;border-radius:var(--r);box-shadow:0 0 0 1px var(--line);}
+.cfv2-kitbox .kh{margin:0 0 8px;display:flex;flex-direction:column;}
+.cfv2-kitbox .kh b{font-size:18px;font-weight:800;font-style:italic;font-stretch:112%;}
+.cfv2-kitbox .kh span{font-size:14px;color:var(--mute);}
+.cfv2-kitbox ul{list-style:none;margin:0 0 10px!important;padding:0;}
+.cfv2-kitbox li{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #EEF0F2;font-size:14.5px;margin:0!important;}
+.cfv2-kitbox li img{width:44px;height:44px;object-fit:contain;background:#fff;box-shadow:0 0 0 1px #EEF0F2;border-radius:4px;padding:3px;box-sizing:border-box;flex:0 0 auto;}
+.cfv2-kitbox li span{flex:1;min-width:0;}
+.cfv2-kitbox li i{font-style:normal;font-size:12.5px;color:var(--mute);margin-left:4px;}
+.cfv2-kitbox li b{font-weight:600;font-variant-numeric:tabular-nums;}
+.cfv2-kitbox .kt span{color:var(--mute);}
+.cfv2-kitbox .kt b{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;}
+.cfv2-kitbox .free{margin:4px 0 10px;}
+.cfv2-kitbox .kadd{margin-top:8px;}
 html.cfv2 .woocommerce-message .button,html.cfv2 .woocommerce-info .button{background:var(--ink)!important;color:#fff!important;border-radius:var(--r)!important;font-weight:650!important;}
 html.cfv2-cart .cart_totals td{text-align:right!important;}
 html.cfv2-cart .coupon .button{white-space:nowrap;}
 @media (min-width:901px){
   .cfv2-chips{flex-wrap:wrap;overflow:visible;}
-  html.cfv2-pdp div.product .summary{position:sticky;top:24px;align-self:start;}
 }
 @media (max-width:900px){
   .cfv2-chips{-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent);padding-right:32px;}
@@ -705,7 +825,7 @@ body.page-template-elementor_canvas .form-card h2{font-family:var(--disp)!import
 body.page-template-elementor_canvas .form-card .fsub{font-size:15px!important;color:var(--night-mute)!important;}
 body.page-template-elementor_canvas .form-card label{font-size:14px!important;font-weight:600!important;text-transform:none!important;letter-spacing:0!important;color:var(--night-ink)!important;}
 body.page-template-elementor_canvas .form-card input,body.page-template-elementor_canvas .form-card textarea{background:var(--night2)!important;font-size:16px!important;}
-body.page-template-elementor_canvas .form-card ::placeholder{color:#6E727A!important;opacity:1;}
+body.page-template-elementor_canvas .form-card ::placeholder{color:#8F939B!important;opacity:1;}
 body.page-template-elementor_canvas .form-card .formnote{font-size:13px!important;color:var(--night-mute)!important;}
 @media (max-width:640px){
   html.cfv2-cart table.cart tr.cart_item{display:grid!important;grid-template-columns:72px 1fr auto;grid-template-areas:"img name rm" "img qty sub";column-gap:14px;row-gap:8px;align-items:center;padding:14px!important;}
@@ -894,6 +1014,7 @@ html.cfv2-pdp div.product{display:grid!important;grid-template-columns:minmax(0,
 html.cfv2-pdp div.product > *{grid-column:1 / -1;}
 html.cfv2-pdp div.product > .woocommerce-product-gallery{grid-column:1;width:100%!important;float:none!important;margin:0!important;}
 html.cfv2-pdp div.product > .summary{grid-column:2;width:100%!important;float:none!important;margin:0!important;position:sticky;top:96px;}
+html.cfv2-pdp div.product > .summary:has(.cfv2-kitbox){position:static;}
 html.cfv2-pdp .woocommerce-product-gallery__wrapper{background:#fff;border-radius:8px;box-shadow:0 0 0 1px var(--line);overflow:hidden;}
 html.cfv2-pdp .woocommerce-product-gallery__image img{width:100%!important;aspect-ratio:1/1;object-fit:contain!important;background:#fff;padding:6%;box-sizing:border-box;}
 html.cfv2-pdp .flex-control-thumbs{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px!important;}
