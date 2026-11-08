@@ -1575,6 +1575,15 @@ html.cfv2 .woocommerce-checkout .form-row[hidden]{display:none!important;}
       new MutationObserver(decorateCards).observe(grid.parentNode, { childList: true, subtree: true });
     }
   }
-  if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', boot);
-  else boot();
+  /* v2.7: the head snippet "CF early paint" hides the page (html.cfv2-wait) until the new layout is built, so it does not jump */
+  function ready() { R.classList.add('cfv2-ready'); R.classList.remove('cfv2-wait'); }
+  function start() {
+    try { boot(); } finally {
+      // wait (at most 1 s) for the Archivo font, so text does not re-flow after the page shows
+      var f = D.fonts && D.fonts.ready ? Promise.race([D.fonts.ready, new Promise(function (r) { setTimeout(r, 1000); })]) : Promise.resolve();
+      f.then(function () { requestAnimationFrame(ready); }, ready);
+    }
+  }
+  if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', start);
+  else start();
 })();
