@@ -1188,6 +1188,7 @@ html.cfv2-home #content{padding:0!important;}
 .cfv2-foot nav p,.cfv2-foot .pay p{margin:0 0 8px;color:#fff;font-weight:650;}
 .cfv2-foot nav a{display:flex;align-items:center;min-height:36px;color:var(--night-mute);text-decoration:none;}
 .cfv2-foot nav a:hover{color:#fff;text-decoration:underline;}
+@media (max-width:900px){ .cfv2-foot nav a{min-height:44px;} .cfv2-head .logo{display:inline-flex;align-items:center;min-height:44px;} } /* v2.6: 44px tap targets on phones */
 .cfv2-foot .copy{margin:0;padding:16px var(--g) 24px;max-width:1320px;margin-inline:auto;border-top:1px solid #2A2C31;font-size:14px;}
 
 /* page shell for every Woo page */
