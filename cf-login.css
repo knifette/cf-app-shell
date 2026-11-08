@@ -1,0 +1,110 @@
+/* Carbon Freaks: branded wp-login.php (log in, lost password, register).
+   Loaded by the WPCode PHP snippet "CF login style" on login_enqueue_scripts. Styling only: no form fields change. */
+body.login{
+  --night:#17181B;--night2:#212328;--ink:#141518;--mute:#565A62;--line:#D9DBDF;--red:#D0140C;--red2:#A80F08;
+  min-height:100vh;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background-color:var(--night);
+  background-image:
+    radial-gradient(ellipse 70% 55% at 50% 0%,rgba(208,20,12,.16),transparent 70%),
+    repeating-linear-gradient(45deg,#1B1D21 0 4px,#202227 4px 8px);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+body.login *{font-family:inherit;}
+body.login .dashicons,body.login .dashicons-before:before{font-family:dashicons!important;}
+#login{width:min(400px,calc(100% - 32px));padding:40px 0 32px;margin:0 auto;}
+
+/* logo */
+.login h1.wp-login-logo{margin:0 0 28px;}
+.login h1.wp-login-logo a{
+  display:block;width:100%;max-width:300px;height:60px;margin:0 auto;
+  background:url(/wp-content/uploads/2026/06/cf-logo.png) center/contain no-repeat;
+  text-indent:-9999px;overflow:hidden;outline-offset:6px;
+}
+
+/* card */
+.login form{
+  margin:0;padding:28px 24px 24px!important;border:0;border-radius:10px;
+  background:#fff;box-shadow:0 24px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.04);
+  overflow:visible;
+}
+.login form p,.login form .user-pass-wrap{margin-bottom:16px;}
+.login label{display:block;margin:0 0 6px;font-size:15px;font-weight:650;color:var(--ink);}
+.login form .input,.login input[type=text],.login input[type=password],.login input[type=email],.login input[type=number]{
+  width:100%;min-height:48px;margin:0!important;padding:0 14px!important;box-sizing:border-box;
+  font-size:17px!important;color:var(--ink);background:#fff;
+  border:1.5px solid #C4C7CC;border-radius:6px;box-shadow:none;
+}
+.login form .input:focus,.login input:focus{border-color:var(--ink)!important;box-shadow:0 0 0 3px rgba(20,21,24,.12)!important;outline:none;}
+.login .wp-pwd{position:relative;}
+.login .wp-pwd .input{padding-right:52px!important;}
+.login .button.wp-hide-pw{top:2px;right:2px;width:44px;height:44px;min-width:44px;color:var(--mute);background:none;border:0;box-shadow:none;}
+.login .button.wp-hide-pw:focus{box-shadow:0 0 0 2px var(--ink);border-radius:4px;}
+.login .button.wp-hide-pw .dashicons{top:.6rem;}
+
+/* Jetpack "prove your humanity" sum */
+.login #loginform > div[style]{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:4px 0 18px!important;}
+.login #loginform > div[style] > p{flex:1 0 100%;margin:0!important;font-size:15px!important;font-weight:650;}
+.login #loginform > div[style] > br{display:none;}
+.login #loginform > div[style] > label{margin:0;font-size:17px;font-weight:700;vertical-align:baseline!important;font-variant-numeric:tabular-nums;}
+.login #jetpack_protect_answer{width:88px!important;height:48px!important;font-size:17px!important;text-align:center;}
+
+/* remember me + submit */
+.login .forgetmenot{float:none;display:flex;align-items:center;gap:8px;margin:0 0 16px;}
+.login .forgetmenot label{display:inline;margin:0;font-weight:500;font-size:15px;}
+.login input[type=checkbox]{width:20px;height:20px;margin:0;border:1.5px solid #9A9EA6;border-radius:4px;}
+.login input[type=checkbox]:checked::before{margin:-1px 0 0 -1px;}
+.login input[type=checkbox]:focus{box-shadow:0 0 0 3px rgba(20,21,24,.15);}
+.login .forgetmenot .wp-tooltip__toggle{color:var(--mute);}
+.login .submit{float:none;margin:0!important;padding:0;}
+.login .button-primary,.login .submit .button-primary{
+  float:none;display:block;width:100%;min-height:52px;padding:0 20px;
+  font-size:17px!important;font-weight:750;letter-spacing:.01em;line-height:1;
+  color:#fff!important;background:var(--red)!important;border:0!important;border-radius:6px;
+  box-shadow:0 6px 16px rgba(208,20,12,.28)!important;text-shadow:none;cursor:pointer;
+  transition:background .15s,transform .15s;
+}
+.login .button-primary:hover{background:var(--red2)!important;}
+.login .button-primary:active{transform:translateY(1px);}
+.login .button-primary:focus{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--red)!important;outline:none;}
+
+/* Google sign-in (Nextend Social Login) */
+.login #nsl-custom-login-form-main .nsl-container-login-layout-below{padding:16px 0 0!important;}
+.login #nsl-custom-login-form-main .nsl-container-login-layout-below::before{
+  content:"or";display:flex;align-items:center;gap:12px;margin:0 0 16px;color:var(--mute);font-size:14px;
+  background:linear-gradient(var(--line),var(--line)) left center/calc(50% - 22px) 1px no-repeat,
+             linear-gradient(var(--line),var(--line)) right center/calc(50% - 22px) 1px no-repeat;
+  justify-content:center;
+}
+.login .nsl-container-buttons{padding:0!important;width:100%!important;}
+.login .nsl-container-buttons a{width:100%;margin:0!important;}
+.login .nsl-button{display:flex!important;align-items:center;justify-content:center;width:100%;min-height:50px;
+  border-radius:6px!important;box-shadow:0 0 0 1.5px #C4C7CC!important;background:#fff!important;}
+.login .nsl-button:hover{box-shadow:0 0 0 1.5px var(--ink)!important;}
+.login .nsl-button-label-container{font-size:16px!important;font-weight:650;color:var(--ink);}
+.login .nsl-container-buttons a:focus .nsl-button{box-shadow:0 0 0 2px var(--ink)!important;}
+
+/* messages */
+.login .message,.login .notice,.login #login_error,.login .success{
+  margin:0 0 16px;padding:12px 14px;border:0;border-left:4px solid var(--red);border-radius:6px;
+  background:#fff;color:var(--ink);font-size:15px;box-shadow:none;
+}
+.login .message,.login .success{border-left-color:#17803D;}
+.login #login_error a,.login .message a{color:var(--ink);font-weight:650;}
+
+/* links under the card */
+.login #nav,.login #backtoblog{margin:18px 0 0;padding:0;text-align:center;font-size:15px;color:#7E838C;}
+.login #backtoblog{margin-top:10px;}
+.login #nav a,.login #backtoblog a,.login .privacy-policy-page-link a{color:#C9CCD2!important;text-decoration:none;padding:6px 4px;}
+.login #nav a:hover,.login #backtoblog a:hover,.login .privacy-policy-page-link a:hover{color:#fff!important;text-decoration:underline;}
+.login #nav a:focus,.login #backtoblog a:focus,.login .privacy-policy-page-link a:focus{outline:2px solid #fff;outline-offset:2px;box-shadow:none;}
+.login .privacy-policy-page-link{margin:24px 0 0;text-align:center;font-size:14px;}
+.login .language-switcher{display:none;}
+
+@media (max-width:480px){
+  #login{padding:28px 0 24px;}
+  .login h1.wp-login-logo{margin-bottom:22px;}
+  .login h1.wp-login-logo a{height:48px;max-width:240px;}
+  .login form{padding:22px 18px 18px!important;}
+}
+@media (prefers-reduced-motion:reduce){.login .button-primary{transition:none;}}
