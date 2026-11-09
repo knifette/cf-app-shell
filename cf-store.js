@@ -326,16 +326,23 @@
     }).then(withSlugs(ids[0])).then(function (c) { busy(b, false); openDrawer(ids, c); })
       .catch(function () { busy(b, false); location.href = '/cart/'; });
   });
+  /* v2.9: the full carbon build - every set for one bike year, stacked, no part twice */
+  function fullKit(gen) {
+    var ids = [];
+    kitsFor(gen).forEach(function (k) { k.ids.forEach(function (i) { if (ids.indexOf(i) < 0) ids.push(i); }); });
+    return { area: 'Full carbon build', gen: gen, ids: ids, full: true };
+  }
   function kitCard(k, parts) {
     var g = genBySlug(k.gen), t = kitTotal(parts);
     var a = h('article', 'cfv2-kit');
     a.innerHTML = '<div class="ims">' + parts.slice(0, 4).map(function (p) {
         return '<a href="' + esc(p.permalink) + '" tabindex="-1" aria-hidden="true"><img src="' + esc(imgOf(p)) + '" alt="" loading="lazy" width="300" height="300"></a>';
       }).join('') + '</div>' +
-      '<h3>' + esc(k.area) + ' set</h3><p class="kb">' + esc(g.label) + ' · ' + parts.length + ' parts</p>' +
+      '<h3>' + esc(k.full ? k.area : k.area + ' set') + '</h3><p class="kb">' + esc(g.label) + ' · ' + parts.length + ' parts' + (k.full ? ', every set for this bike' : '') + '</p>' +
+      (k.full ? '<details><summary>See all ' + parts.length + ' parts</summary>' : '') +
       '<ul>' + parts.map(function (p) {
         return '<li><a href="' + esc(p.permalink) + '">' + esc(short(p.name)) + '</a><span>' + money(priceOf(p)) + '</span></li>';
-      }).join('') + '</ul>' +
+      }).join('') + '</ul>' + (k.full ? '</details>' : '') +
       '<p class="kt"><b>' + money(t) + '</b>' + (t >= FREESHIP ? '<span class="free">' + ICON.truck + 'Ships free</span>' : '') + '</p>' +
       '<button type="button" class="kadd" data-kit="' + parts.map(function (p) { return p.id; }).join(',') + '">Add all ' + parts.length + ' to cart</button>';
     return a;
@@ -515,7 +522,7 @@
       grid.removeAttribute('aria-busy');
 
       // sets: the visitor's bike only, or a mix across the three years
-      var ks = bike ? kitsFor(bike.slug) : GENS.reduce(function (acc, g, i) {
+      var ks = bike ? [fullKit(bike.slug)].concat(kitsFor(bike.slug)) : GENS.reduce(function (acc, g, i) {
         return acc.concat(kitsFor(g.slug).slice(0, 2));
       }, []);
       var kbox = $('.cfv2-kits', root);
@@ -567,6 +574,20 @@
       anchor.parentNode.insertBefore(chips, areas);
     }
     decorateCards();
+    var g = GENS.filter(function (x) { return path.indexOf(GEN_URL + x.slug + '/') === 0; })[0];
+    if (g && list && !$('.cfv2-full')) {
+      products().then(function (all) {
+        var byId = {};
+        all.forEach(function (p) { byId[p.id] = p; });
+        var parts = kitParts(fullKit(g.slug), byId);
+        if (parts.length < 2) return;
+        var sec = h('section', 'cfv2-full');
+        sec.innerHTML = '<h2>Want the lot?</h2><p>Every set we make for the ' + esc(g.label) + ', in one cart. The price is the parts added up.</p><div class="cfv2-kits"></div>';
+        $('.cfv2-kits', sec).appendChild(kitCard(fullKit(g.slug), parts));
+        var after = $('.woocommerce-pagination') || list;
+        after.parentNode.insertBefore(sec, after.nextSibling);
+      }).catch(function () {});
+    }
   }
   function decorateCards() {
     $$('ul.products li.product').forEach(function (li) {
@@ -588,6 +609,33 @@
   /* ------------------------------------------------------------------ */
   /* product page                                                        */
   /* ------------------------------------------------------------------ */
+  /* v2.9: a soft light band slides across the carbon as the phone tilts (or the mouse moves).
+     Skipped for reduced motion, and on iPhone, which would need a permission prompt. */
+  function sheen() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var box = $('.woocommerce-product-gallery .flex-viewport') || $('.woocommerce-product-gallery__wrapper');
+    if (!box || $('.cfv2-sheen', box)) return;
+    var sh = h('span', 'cfv2-sheen');
+    sh.setAttribute('aria-hidden', 'true');
+    box.appendChild(sh);
+    var x = 50, raf = 0;
+    function put(v) {
+      x = Math.max(0, Math.min(100, v));
+      if (!raf) raf = requestAnimationFrame(function () { raf = 0; sh.style.setProperty('--sx', x + '%'); });
+    }
+    box.addEventListener('pointermove', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      var r = box.getBoundingClientRect();
+      put((e.clientX - r.left) / r.width * 100);
+    });
+    var DOE = window.DeviceOrientationEvent;
+    if (DOE && typeof DOE.requestPermission !== 'function') {
+      window.addEventListener('deviceorientation', function (e) {
+        if (e.gamma == null) return;
+        put(50 + e.gamma * 2.5);
+      });
+    }
+  }
   function pdp() {
     R.classList.add('cfv2-pdp');
     var prod = $('div.product[id^="product-"]') || $('div.product');
@@ -1534,7 +1582,21 @@ html.cfv2 .cfv2-search .sf input:focus,html.cfv2 .cfv2-search .sf input:focus-vi
 .cfv2-build li a{color:var(--ink)!important;}
 html.cfv2 .woocommerce-checkout .form-row[hidden]{display:none!important;}
 .cfv2-opt{display:block;margin:6px 0 0;padding:8px 0;min-height:44px;border:0!important;background:none!important;box-shadow:none!important;color:var(--ink);font:inherit;font-size:15px;font-weight:650;text-decoration:underline;cursor:pointer;clear:both;}
+.cfv2-full{margin:32px 0 8px;}
+.cfv2-full h2{margin:0 0 4px;font-size:26px;font-weight:800;font-style:italic;font-stretch:112%;}
+.cfv2-full > p{margin:0 0 14px;color:var(--mute);font-size:15.5px;}
+.cfv2-full .cfv2-kits{grid-template-columns:minmax(0,520px);}
+.cfv2-kit details summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-size:15px;font-weight:650;color:var(--ink);}
+.cfv2-kit details[open] summary{margin-bottom:4px;}
+.cfv2-kit details summary{list-style:none;gap:8px;}
+.cfv2-kit details summary::-webkit-details-marker{display:none;}
+.cfv2-kit details summary::after{content:'+';font-size:20px;line-height:1;color:var(--mute);}
+.cfv2-kit details[open] summary::after{content:'−';}
+html.cfv2-pdp .woocommerce-product-gallery .flex-viewport,html.cfv2-pdp .woocommerce-product-gallery__wrapper{position:relative;}
+.cfv2-sheen{position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:overlay;opacity:.55;
+  background:linear-gradient(105deg,transparent calc(var(--sx,50%) - 22%),rgba(255,255,255,.75) var(--sx,50%),transparent calc(var(--sx,50%) + 22%));}
 @media (prefers-reduced-motion:reduce){
+  .cfv2-sheen{display:none;}
   .cfv2-card .plate img,#cfv2-home .gen,.cfv2-drawer .panel,.cfv2-drawer .scrim,.cfv2-sticky,.cfv2-tabs,.cfv2-search .sbox,.cfv2-count.pop{transition:none!important;animation:none!important;}
   .cfv2-card:hover .plate img{transform:none;}
   #cfv2-home .gen:hover{transform:none;}
@@ -1581,7 +1643,7 @@ html.cfv2 .woocommerce-checkout .form-row[hidden]{display:none!important;}
     wireAdds();
     loadCart().catch(function () {});
     if (/(^|\s)home(\s|$)/.test(b)) home();
-    else if (/single-product/.test(b)) pdp();
+    else if (/single-product/.test(b)) { pdp(); if (D.readyState === 'complete') setTimeout(sheen, 300); else window.addEventListener('load', function () { setTimeout(sheen, 300); }); }
     else if (/(post-type-archive-product|tax-product_cat|woocommerce-shop)/.test(b)) shop();
     else if (/woocommerce-cart/.test(b)) cart();
     if (/woocommerce-order-received/.test(b)) thankYou();
