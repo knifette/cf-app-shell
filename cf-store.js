@@ -15,7 +15,7 @@
 
   var D = document, R = D.documentElement;
   var FREESHIP = 1500; // live WooCommerce free-shipping rule (raised from 600 on 2026-11-08)
-  var LOGO = '/wp-content/uploads/2026/06/cf-logo.png';
+  var LOGO = '/wp-content/uploads/2026/11/cf-logo-480.webp';
   var GENS = [
     { slug: 's1000rr-2019-2022', label: 'S1000RR 2019–2022', from: 2019, to: 2022, hero: 964 },
     { slug: 's1000rr-2023-2024', label: 'S1000RR 2023–2024', from: 2023, to: 2024, hero: 3596 },
