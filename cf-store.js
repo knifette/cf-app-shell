@@ -574,6 +574,13 @@
       anchor.parentNode.insertBefore(chips, areas);
     }
     decorateCards();
+    // v2.9.2: on phones the category intro goes under the parts, so the parts come first
+    var desc = $('.woocommerce-products-header .term-description');
+    if (desc && list && window.matchMedia && window.matchMedia('(max-width: 768px)').matches) {
+      var below = $('.woocommerce-pagination') || list;
+      desc.classList.add('is-below');
+      below.parentNode.insertBefore(desc, below.nextSibling);
+    }
     var g = GENS.filter(function (x) { return path.indexOf(GEN_URL + x.slug + '/') === 0; })[0];
     if (g && list && !$('.cfv2-full')) {
       products().then(function (all) {
@@ -1582,6 +1589,8 @@ html.cfv2 .cfv2-search .sf input:focus,html.cfv2 .cfv2-search .sf input:focus-vi
 .cfv2-build li a{color:var(--ink)!important;}
 html.cfv2 .woocommerce-checkout .form-row[hidden]{display:none!important;}
 .cfv2-opt{display:block;margin:6px 0 0;padding:8px 0;min-height:44px;border:0!important;background:none!important;box-shadow:none!important;color:var(--ink);font:inherit;font-size:15px;font-weight:650;text-decoration:underline;cursor:pointer;clear:both;}
+html.cfv2 .term-description a{color:var(--ink)!important;text-decoration:underline;font-weight:650;}
+.term-description.is-below{margin:28px 0 0;padding-top:20px;border-top:1px solid var(--line);font-size:15px;color:var(--mute);}
 .cfv2-full{margin:32px 0 8px;}
 .cfv2-full h2{margin:0 0 4px;font-size:26px;font-weight:800;font-style:italic;font-stretch:112%;}
 .cfv2-full > p{margin:0 0 14px;color:var(--mute);font-size:15.5px;}
