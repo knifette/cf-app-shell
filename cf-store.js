@@ -1591,6 +1591,9 @@ html.cfv2 .woocommerce-checkout .form-row[hidden]{display:none!important;}
 .cfv2-opt{display:block;margin:6px 0 0;padding:8px 0;min-height:44px;border:0!important;background:none!important;box-shadow:none!important;color:var(--ink);font:inherit;font-size:15px;font-weight:650;text-decoration:underline;cursor:pointer;clear:both;}
 html.cfv2 .term-description a{color:var(--ink)!important;text-decoration:underline;font-weight:650;}
 .term-description.is-below{margin:28px 0 0;padding-top:20px;border-top:1px solid var(--line);font-size:15px;color:var(--mute);}
+html.cfv2 .woocommerce-terms-and-conditions-wrapper label.checkbox{display:flex!important;align-items:flex-start;gap:10px;min-height:44px;padding:10px 0;font-size:15.5px;line-height:1.45;color:var(--ink);cursor:pointer;}
+html.cfv2 .woocommerce-terms-and-conditions-wrapper #terms{flex:none;width:22px;height:22px;margin:1px 0 0;accent-color:var(--ink);}
+html.cfv2 .woocommerce-terms-and-conditions-checkbox-text a{color:var(--ink)!important;text-decoration:underline;font-weight:650;}
 .cfv2-full{margin:32px 0 8px;}
 .cfv2-full h2{margin:0 0 4px;font-size:26px;font-weight:800;font-style:italic;font-stretch:112%;}
 .cfv2-full > p{margin:0 0 14px;color:var(--mute);font-size:15.5px;}
@@ -1627,6 +1630,15 @@ html.cfv2-pdp .woocommerce-product-gallery .flex-viewport,html.cfv2-pdp .woocomm
     if (old) old.media = 'not all';
   }
 
+  /* v2.10: the checkout terms box says what it is: every sale is final (Woo still requires the tick server-side) */
+  function finalSaleTerms() {
+    var t = $('.woocommerce-terms-and-conditions-checkbox-text');
+    if (!t || t.getAttribute('data-cf')) return;
+    var a = $('a.woocommerce-terms-and-conditions-link', t);
+    t.setAttribute('data-cf', '1');
+    t.innerHTML = 'I understand every sale is final, and I agree to the ' +
+      (a ? '<a href="' + esc(a.getAttribute('href')) + '" class="woocommerce-terms-and-conditions-link" target="_blank">Final Sale policy</a>' : 'Final Sale policy') + '.';
+  }
   function shortNames() {
     $$('.shop_table .product-name').forEach(function (td) {
       var t = $('a', td) || td;
@@ -1658,9 +1670,9 @@ html.cfv2-pdp .woocommerce-product-gallery .flex-viewport,html.cfv2-pdp .woocomm
     if (/woocommerce-order-received/.test(b)) thankYou();
     else if (/woocommerce-checkout/.test(b)) slimCheckout();
     if (/woocommerce-(cart|checkout)/.test(b)) {
-      shortNames();
+      shortNames(); finalSaleTerms();
       var ot = $('#order_review') || $('.entry-content > .woocommerce');
-      if (ot && window.MutationObserver) new MutationObserver(shortNames).observe(ot, { childList: true, subtree: true });
+      if (ot && window.MutationObserver) new MutationObserver(function () { shortNames(); finalSaleTerms(); }).observe(ot, { childList: true, subtree: true });
     }
 
     var grid = $('ul.products');
